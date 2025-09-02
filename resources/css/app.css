@@ -9,3 +9,89 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+
+
+:root {
+  --pdogreen: #0f3c28;   
+  --pdogold: #d4a017;    
+}
+
+/* ==== Navbar Styling === */
+.navbar {
+  background-color: var(--pdogreen) !important;
+}
+.navbar-brand, .nav-link, .btn-outline-light {
+  color: #fff !important;
+}
+.navbar-nav .nav-link:hover {
+  color: var(--pdogold) !important;
+}
+
+/* ====  (Banner) === */
+header.bg-light {
+  background: linear-gradient(135deg, var(--pdogreen) 0%, #266444 100%);
+  color: #f5f5f5;
+}
+header h1 {
+  color: #fff;
+  font-weight: 700;
+}
+header p {
+  color: rgba(0, 51, 17, 0.85);
+}
+
+header .text-muted {
+  color: var(--pdogold) !important;
+  font-size: 1.2rem;       
+  font-weight: 400;        
+  letter-spacing: 0.3px;   
+}
+
+
+
+/* ==== Buttons === */
+.btn-primary {
+  background-color: var(--pdogold) !important;
+  border-color: var(--pdogold) !important;
+  color: var(--pdogreen) !important;
+}
+.btn-primary:hover {
+  background-color: #b88f12 !important;
+}
+
+.btn-outline-secondary {
+  color: var(--pdogold) !important;
+  border-color: var(--pdogold) !important;
+}
+.btn-outline-secondary:hover {
+  background-color: var(--pdogold) !important;
+  color: #fff !important;
+}
+
+/* ==== Cards (Features) === */
+.card {
+  border: none;
+  background-color: #fafaf9;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+.card h5 {
+  color: var(--pdogreen);
+}
+.card p {
+  color: #fffdfd;
+}
+
+/* ==== Footer === */
+footer {
+  background-color: var(--pdogreen) !important;
+  color: #0f3c28;
+}
+footer p {
+  margin: 0;
+  font-size: 0.9rem;
+}
