@@ -86,6 +86,21 @@ header .text-muted {
   color: #fffdfd;
 }
 
+.card.shadow-sm.h-100 {
+  max-width: 320px;         
+  min-width: 250px;         
+  height: auto;            
+  margin: 0 auto;           
+  border-radius: 12px;     
+  overflow: hidden;         
+}
+
+.card.shadow-sm.h-100 img {
+  height: 200px;            
+  object-fit: cover;        
+}
+
+
 /* ==== Footer === */
 footer {
   background-color: var(--pdogreen) !important;
