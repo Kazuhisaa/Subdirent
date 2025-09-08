@@ -13,3 +13,8 @@ Route::get('/apply', function () {
 })->name('apply');
 
 Route::post('/apply', [ApplicationCtrl::class, 'submit'])->name('apply.submit');
+
+
+
+
+// RestApi routes for Booking
