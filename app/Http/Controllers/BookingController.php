@@ -77,4 +77,8 @@ class BookingController extends Controller
         ],201);
     }
 
+
+    public function testApi(){
+      return response()->json(['message'=>'success'],201);
+    }
 }
