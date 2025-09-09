@@ -10,8 +10,29 @@ class BookingController extends Controller
 {
     //
     
-   public function getByDate(){
-
+    /**
+     * Retrieve booked time slots for a given property and date.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+   public function getByDate(Request $request){
+           
+     $request->validate([
+       'booking_date' => 'required|date',
+       'property_id' => 'required|integer|exists:units,id', 
+     ]);
+   
+      $bookSlots = Booking::where([
+        'booking_date' => $request->booking_date,
+         'property_id' =>$request->property_id
+      ])->pluck('booking_time');
+     
+      return response()->json([
+         'property_id' => $request->property_id,
+         'booking_date' => $request->booking_date,
+         'slot' => $bookSlotes
+    ]);
    }
 
     public function store(Request $request){
