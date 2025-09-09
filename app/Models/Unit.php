@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class units extends Model
+class Unit extends Model
 {
     //
 
@@ -12,6 +12,7 @@ class units extends Model
      'title',
      'description',
      'bedrooms',
+      'bathrooms',
      'floor_area',
      'location',
       'price'

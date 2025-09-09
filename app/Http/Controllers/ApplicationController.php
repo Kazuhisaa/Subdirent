@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class ApplicationCtrl extends Controller
+class ApplicationController extends Controller
 {
     public function submit(Request $request)
     {
