@@ -12,4 +12,5 @@ Route::prefix('booking')->group(function () {
 
 Route::prefix('units')->group(function () {
     Route::post('/newunit', [UnitsController::class, 'store']);
+    Route::get('/allunits',[UnitsController::class,'index']);
 });

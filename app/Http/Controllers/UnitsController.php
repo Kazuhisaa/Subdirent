@@ -9,6 +9,8 @@ class UnitsController extends Controller
 {
     //
 
+
+    //Add new Unit
     public function store(Request $request){
      
     $fields = $request->validate([
@@ -42,5 +44,11 @@ return response()->json([
 
 
 
+    public function index()
+    {
+        $unit = Unit::all();
+
+        return response()->json($unit);
+    }
 
 }
