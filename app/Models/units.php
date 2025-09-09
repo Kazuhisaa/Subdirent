@@ -9,6 +9,12 @@ class units extends Model
     //
 
     protected $fillable =[
-      
+     'title',
+     'description',
+     'bedrooms',
+     'floor_area',
+     'location',
+      'price'
+
     ];
 }

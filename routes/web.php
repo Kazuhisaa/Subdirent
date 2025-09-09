@@ -27,5 +27,5 @@ Route::prefix('booking')->group(function(){
 
     Route::get('/book-slot',[BookingController::class,'getByDate']);
     Route::post('/schedule',[BookingController::class,'store']);
-    Route::get(['/Testing'],[BookingController::class,'testApi']);
+    Route::get('/Testing',[BookingController::class,'testApi']);
 });

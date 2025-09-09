@@ -20,8 +20,7 @@ return new class extends Migration
     $table->integer('floor_area')->nullable(); 
     $table->string('location');
     $table->decimal('price', 10, 2); 
-    $table->boolean('is_rented')->default(false);   // <<< Dito mo malalaman kung nirent na
-    $table->date('available_from')->nullable(); 
+    $table->boolean('is_rented')->default(false);   //  $table->date('available_from')->nullable(); 
     $table->timestamps();
 });
 
@@ -35,3 +34,5 @@ return new class extends Migration
         Schema::dropIfExists('units');
     }
 };
+
+   
