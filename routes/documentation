@@ -1,72 +1,181 @@
+Narito ang **plain-text API documentation** na naka-base mismo sa iyong BookingController at UnitsController. Pwede mo na lang i-paste sa text file:
+
+```
 API Documentation
 =================
 
 BOOKING ROUTES
 --------------
 
-1. GET  /api/booking/book-slot  
-   - Controller Method: BookingController@getByDate  
-   - Description: Kunin ang mga available o naka-book na slots base sa petsa.  
-   - Parameters: Maaaring gumamit ng query parameters para sa petsa (hal. ?date=2025-09-10).  
-   - Returns: JSON ng booking data para sa petsang iyon.
+1. GET /api/booking/book-slot  
+   - Controller: BookingController@getByDate  
+   - Description: Kunin ang mga naka-book na oras para sa isang property sa isang partikular na petsa.  
+   - Query Parameters (required):  
+     booking_date : string (format: YYYY-MM-DD)  
+     property_id  : integer (umiiral sa units table)  
+   - Example Request:  
+     GET /api/booking/book-slot?booking_date=2025-09-15&property_id=3  
+   - Example Response:  
+     {
+       "property_id": 3,
+       "booking_date": "2025-09-15",
+       "slot": ["10:00", "14:00"]
+     }
 
 2. POST /api/booking/schedule  
-   - Controller Method: BookingController@store  
-   - Description: Gumawa o mag-schedule ng bagong booking.  
+   - Controller: BookingController@store  
+   - Description: Gumawa ng bagong booking kung available pa ang oras.  
    - Body (JSON Example):  
      {
-       "date": "2025-09-15",
-       "time": "10:00",
-       "unit_id": 3,
-       "customer_name": "Juan Dela Cruz"
+       "property_id": 3,
+       "booking_date": "2025-09-15",
+       "booking_time": "10:00",
+       "full_name": "Juan Dela Cruz",
+       "email": "juan@example.com",
+       "phone_number": "09123456789",
+       "visit_type": "Site Viewing",
+       "notes": "Please call before visit"
      }  
-   - Returns: JSON confirmation ng bagong booking.
+   - Example Response (Success 201):  
+     {
+       "message": "booking confirmed",
+       "booking": {
+         "id": 25,
+         "property_id": 3,
+         "booking_date": "2025-09-15",
+         "booking_time": "10:00",
+         "full_name": "Juan Dela Cruz",
+         "email": "juan@example.com",
+         "phone_number": "09123456789",
+         "visit_type": "Site Viewing",
+         "notes": "Please call before visit",
+         "created_at": "2025-09-10T08:10:00Z",
+         "updated_at": "2025-09-10T08:10:00Z"
+       }
+     }  
+   - Example Response (Conflict 409):  
+     {
+       "message": "Time slot already booked!"
+     }
 
-3. GET  /api/booking/Testing  
-   - Controller Method: BookingController@testApi  
-   - Description: Test endpoint para i-verify na gumagana ang API.  
-   - Returns: Simple JSON response (pang-testing lang).
+3. GET /api/booking/Testing  
+   - Controller: BookingController@testApi  
+   - Description: Test endpoint para siguraduhing gumagana ang API.  
+   - Example Response:  
+     {
+       "message": "success"
+     }
 
 UNITS ROUTES
 ------------
 
 4. POST /api/units/newunit  
-   - Controller Method: UnitsController@store  
-   - Description: Magdagdag ng bagong unit.  
+   - Controller: UnitsController@store  
+   - Description: Magdagdag ng bagong property/unit.  
    - Body (JSON Example):  
      {
-       "name": "Unit A",
-       "description": "Sample unit description"
+       "title": "Modern Condo",
+       "description": "A spacious modern condo near the city center",
+       "bedrooms": 2,
+       "bathrooms": 1,
+       "floor_area": 60,
+       "location": "Makati City",
+       "price": 2500000
      }  
-   - Returns: JSON ng bagong unit na na-save.
+   - Example Response:  
+     {
+       "message": "unit created",
+       "units": {
+         "id": 7,
+         "title": "Modern Condo",
+         "description": "A spacious modern condo near the city center",
+         "bedrooms": 2,
+         "bathrooms": 1,
+         "floor_area": 60,
+         "location": "Makati City",
+         "price": 2500000,
+         "created_at": "2025-09-10T08:15:00Z",
+         "updated_at": "2025-09-10T08:15:00Z"
+       }
+     }
 
-5. GET  /api/units/allunits  
-   - Controller Method: UnitsController@index  
+5. GET /api/units/allunits  
+   - Controller: UnitsController@index  
    - Description: Kunin ang lahat ng units.  
-   - Returns: JSON array ng lahat ng units.
+   - Example Response:  
+     [
+       {
+         "id": 7,
+         "title": "Modern Condo",
+         "description": "A spacious modern condo near the city center",
+         "bedrooms": 2,
+         "bathrooms": 1,
+         "floor_area": 60,
+         "location": "Makati City",
+         "price": 2500000
+       },
+       {
+         "id": 8,
+         "title": "Studio Apartment",
+         "description": "Small but cozy studio",
+         "bedrooms": 0,
+         "bathrooms": 1,
+         "floor_area": 25,
+         "location": "Quezon City",
+         "price": 850000
+       }
+     ]
 
-6. GET  /api/units/findunit/{id}  
-   - Controller Method: UnitsController@show  
-   - Description: Hanapin at kunin ang detalye ng isang unit gamit ang ID.  
-   - Parameters:  
-     {id} – ID ng unit.  
-   - Returns: JSON ng unit data.
-
-7. PUT  /api/units/updateUnit/{unit}  
-   - Controller Method: UnitsController@update  
-   - Description: I-update ang detalye ng isang unit.  
-   - Parameters:  
-     {unit} – ID ng unit na i-uupdate.  
-   - Body (JSON Example):  
+6. GET /api/units/findunit/{id}  
+   - Controller: UnitsController@show  
+   - Description: Kunin ang detalye ng unit ayon sa ID.  
+   - Example Request: GET /api/units/findunit/7  
+   - Example Response:  
      {
-       "name": "Updated Unit A",
-       "description": "Updated description"
+       "id": 7,
+       "title": "Modern Condo",
+       "description": "A spacious modern condo near the city center",
+       "bedrooms": 2,
+       "bathrooms": 1,
+       "floor_area": 60,
+       "location": "Makati City",
+       "price": 2500000
+     }
+
+7. PUT /api/units/updateUnit/{unit}  
+   - Controller: UnitsController@update  
+   - Description: I-update ang detalye ng isang unit.  
+   - Example Request Body:  
+     {
+       "title": "Modern Condo - Updated",
+       "description": "Updated description for the condo",
+       "bedrooms": 3,
+       "bathrooms": 2,
+       "floor_area": 75,
+       "location": "Makati City",
+       "price": 2700000
      }  
-   - Returns: JSON ng updated unit data.
+   - Example Response:  
+     {
+       "message": "Unit updated successfully",
+       "unit": {
+         "id": 7,
+         "title": "Modern Condo - Updated",
+         "description": "Updated description for the condo",
+         "bedrooms": 3,
+         "bathrooms": 2,
+         "floor_area": 75,
+         "location": "Makati City",
+         "price": 2700000,
+         "updated_at": "2025-09-10T08:20:00Z"
+       }
+     }
 
 8. DELETE /api/units/deleteunit/{unit}  
-   - Controller Method: UnitsController@destroy  
-   - Description: I-delete ang isang unit gamit ang ID.  
-   - Parameters:  
-     {unit} – ID ng unit na ide-delete.  
-   - Returns: JSON confirmation ng deletion.
+   - Controller: UnitsController@destroy  
+   - Description: Burahin ang unit ayon sa ID.  
+   - Example Response:  
+     {
+       "message": "unit deleted succesfully"
+     }
+```
