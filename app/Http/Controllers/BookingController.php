@@ -79,6 +79,6 @@ class BookingController extends Controller
 
 
     public function testApi(){
-      return response()->json(['message'=>'success'],201);
+      return response()->json(['message'=>'success'],201); 
     }
 }

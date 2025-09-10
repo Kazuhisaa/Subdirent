@@ -43,12 +43,54 @@ return response()->json([
     }
 
 
-
+// get all unit
     public function index()
     {
         $unit = Unit::all();
 
         return response()->json($unit);
     }
+   
+   //show by id
+    public function show($id){
+       $unit = Unit::findOrFail($id);
+
+       return response()->json($unit);
+    }
+  
+
+   // update
+     public function update(Request $request,Unit $unit)
+     {
+     $validated = $request->validate([
+    'title' => 'required|string|max:255',
+    'description' => 'required|string',
+    'bedrooms' => 'nullable|integer|min:0',
+    'bathrooms' => 'nullable|integer|min:0',
+    'floor_area' => 'nullable|integer|min:0',
+    'location' => 'required|string|max:255',
+    'price' => 'required|numeric|min:0',
+]);
+     
+      $unit->update($validated);
+
+     
+       
+        return response()->json([
+            'message' => 'Unit updated successfully',
+            'unit' => $unit
+        ]);
+
+
+     }
+
+//delete
+public function destroy(Unit $unit)
+{
+    $unit->delete();
+
+    return response()->json(['message'=>'unit deleted succesfully']);
+}
+      
 
 }
