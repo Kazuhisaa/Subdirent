@@ -10,7 +10,7 @@
 </head>
 
 <body class="bg-light">
-
+  @include('admin.admin')
   <div class="container py-4">
     <h2 class="mb-4">🏠 Admin - Manage Units</h2>
 
@@ -109,7 +109,7 @@
 
     // Load all units from API
     function loadUnits() {
-      fetch('/api/units')
+      fetch('/api/units/allunits')
         .then(res => res.json())
         .then(units => {
           unitsBody.innerHTML = '';
@@ -138,7 +138,7 @@
       e.preventDefault();
       let formData = new FormData(this);
 
-      fetch('/api/units', {
+      fetch('/api/units/newunit', {
           method: 'POST',
           body: formData
         })
@@ -156,7 +156,7 @@
     // Delete unit
     function deleteUnit(id) {
       if (confirm('Are you sure you want to delete this unit?')) {
-        fetch(`/api/units/${id}`, {
+        fetch(`/api/units/deleteunit/${id}`, {
             method: 'DELETE'
           })
           .then(res => res.json())

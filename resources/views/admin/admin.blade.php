@@ -27,11 +27,7 @@
       <div class="d-grid gap-2">
         <a href="#" class="btn btn-outline-primary btn-block fw-semibold">Dashboard</a>
         <a href="#" class="btn btn-outline-primary btn-block fw-semibold">Tenants</a>
-        <button class="btn btn-outline-primary btn-block fw-semibold"
-          data-bs-toggle="modal" data-bs-target="#addUnitModal">
-          Units
-        </button>
-        @include('admin.addUnit')
+        <a href="{{ route('admin.units') }}" class="btn btn-outline-primary btn-block fw-semibold">Units</a>
         <a href="#" class="btn btn-outline-primary btn-block fw-semibold">Bookings</a>
         <a href="#" class="btn btn-outline-primary btn-block fw-semibold">Payments</a>
         <a href="#" class="btn btn-outline-primary btn-block fw-semibold">Maintenance</a>
