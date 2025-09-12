@@ -16,5 +16,6 @@ Route::get('/apply', function () {
 Route::post('/apply', [ApplicationController::class, 'submit'])->name('apply.submit');
 
 
-
-
+Route::get('/admin/admin', function () {
+    return view('admin.admin');
+})->name('admin.dashboard');
