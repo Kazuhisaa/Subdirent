@@ -15,7 +15,8 @@ class Unit extends Model
     'bathrooms',
     'floor_area',
     'location',
-    'price'
+    'price',
+    'image'
 
   ];
 }
