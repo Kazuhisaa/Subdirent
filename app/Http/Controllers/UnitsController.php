@@ -19,7 +19,7 @@ class UnitsController extends Controller
             'floor_area' => 'nullable|integer|min:0',
             'location' => 'required|string|max:255',
             'price' => 'required|numeric|min:0',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048', // ✅ validation para sa image
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
         $imageName = null;
