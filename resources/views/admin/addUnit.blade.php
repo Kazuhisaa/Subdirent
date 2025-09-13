@@ -20,7 +20,7 @@
     </button>
 
     <!-- Add Unit Modal -->
-    <div class="modal fade" id="addUnitModal" tabindex="-1" aria-labelledby="addUnitModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addUnitModal" tabindex="-1" aria-labelledby="addUnitModalLabel">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header bg-primary text-white">
@@ -227,7 +227,7 @@
           this.reset();
           loadUnits();
           const addUnitModal = bootstrap.Modal.getInstance(document.getElementById('addUnitModal'));
-          addUnitModal.hide(); // close modal
+          addUnitModal.hide();
         })
         .catch(err => alert('❌ Error adding unit'));
     });

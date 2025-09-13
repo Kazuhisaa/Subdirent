@@ -26,7 +26,7 @@
     <div class="bg-light border-end p-3" style="width: 220px;">
       <div class="d-grid gap-2">
         <a href="#" class="btn btn-outline-primary btn-block fw-semibold">Dashboard</a>
-        <a href="#" class="btn btn-outline-primary btn-block fw-semibold">Tenants</a>
+        <a href="{{ route('admin.tenants') }}" class="btn btn-outline-primary btn-block fw-semibold">Tenants</a>
         <a href="{{ route('admin.units') }}" class="btn btn-outline-primary btn-block fw-semibold">Units</a>
         <a href="#" class="btn btn-outline-primary btn-block fw-semibold">Bookings</a>
         <a href="#" class="btn btn-outline-primary btn-block fw-semibold">Payments</a>
