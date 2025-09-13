@@ -20,3 +20,11 @@ Route::post('/apply', [ApplicationController::class, 'submit'])->name('apply.sub
 Route::get('/admin/admin', function () {
     return view('admin.admin');
 })->name('admin.dashboard');
+
+Route::get('/admin/addUnit', function () {
+    return view('admin.addUnit');
+})->name('admin.addUnit');
+
+Route::get('/admin/addTenant', function () {
+    return view('admin.addTenant');
+})->name('admin.addTenant');
