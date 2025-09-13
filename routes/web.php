@@ -5,6 +5,7 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\UnitsController;
 
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
@@ -19,3 +20,8 @@ Route::post('/apply', [ApplicationController::class, 'submit'])->name('apply.sub
 Route::get('/admin/admin', function () {
     return view('admin.admin');
 })->name('admin.dashboard');
+
+// Booking page
+Route::get('/booking', function () {
+    return view('booking'); 
+})->name('booking');
