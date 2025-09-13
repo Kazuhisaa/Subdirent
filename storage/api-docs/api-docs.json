@@ -1,0 +1,177 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Subdirent api",
+        "description": "Swagger documentation for Subdirent",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/bookings/book-slot": {
+            "get": {
+                "tags": [
+                    "Booking"
+                ],
+                "summary": "Retrieve booked time slots for a given property and date",
+                "operationId": "ee017cd7ed39bb0480504c355698cae0",
+                "parameters": [
+                    {
+                        "name": "property_id",
+                        "in": "query",
+                        "description": "ID of the property",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "booking_date",
+                        "in": "query",
+                        "description": "Booking date in YYYY-MM-DD format",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of booked time slots",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "property_id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "booking_date": {
+                                            "type": "string",
+                                            "example": "2025-09-12"
+                                        },
+                                        "slot": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "10:00"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/bookings/schedule": {
+            "post": {
+                "tags": [
+                    "Booking"
+                ],
+                "summary": "Create a new booking",
+                "operationId": "e260c585ce779300edb27d5db6382c80",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "property_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "booking_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-12"
+                                    },
+                                    "booking_time": {
+                                        "type": "string",
+                                        "example": "10:00"
+                                    },
+                                    "full_name": {
+                                        "type": "string",
+                                        "example": "Juan Dela Cruz"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "juan@example.com"
+                                    },
+                                    "phone_number": {
+                                        "type": "string",
+                                        "example": "09123456789"
+                                    },
+                                    "visit_type": {
+                                        "type": "string",
+                                        "example": "Inspection"
+                                    },
+                                    "notes": {
+                                        "type": "string",
+                                        "example": "Bring ID"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Booking confirmed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "booking confirmed"
+                                        },
+                                        "booking": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Time slot already booked"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/test": {
+            "get": {
+                "tags": [
+                    "Test"
+                ],
+                "summary": "Get test data",
+                "operationId": "7a09caa81b6dfd4c5087d06d7689eaa8",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Booking",
+            "description": "Booking"
+        },
+        {
+            "name": "Test",
+            "description": "Test"
+        }
+    ]
+}
