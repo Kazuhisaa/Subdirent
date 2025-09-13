@@ -23,8 +23,8 @@ Route::get('/admin/admin', function () {
 
 Route::get('/admin/addUnit', function () {
     return view('admin.addUnit');
-})->name('admin.addUnit');
+})->name('admin.units');
 
 Route::get('/admin/addTenant', function () {
     return view('admin.addTenant');
-})->name('admin.addTenant');
+})->name('admin.tenants');

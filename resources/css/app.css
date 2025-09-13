@@ -10,14 +10,12 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-
-
 :root {
   --pdogreen: #0f3c28;   
   --pdogold: #d4a017;    
 }
 
-/* ==== Navbar Styling === */
+/* ==== Navbar ==== */
 .navbar {
   background-color: var(--pdogreen) !important;
 }
@@ -28,29 +26,30 @@
   color: var(--pdogold) !important;
 }
 
-/* ====  (Banner) === */
+/* ==== Banner ==== */
 header.bg-light {
   background: linear-gradient(135deg, var(--pdogreen) 0%, #266444 100%);
   color: #f5f5f5;
+  padding: 2rem 1rem;
+  text-align: center;
 }
 header h1 {
   color: #fff;
   font-weight: 700;
+  font-size: 2.5rem;
 }
 header p {
   color: rgba(0, 51, 17, 0.85);
+  font-size: 1.2rem;
 }
-
 header .text-muted {
   color: var(--pdogold) !important;
-  font-size: 1.2rem;       
-  font-weight: 400;        
-  letter-spacing: 0.3px;   
+  font-size: 1.2rem;
+  font-weight: 400;
+  letter-spacing: 0.3px;
 }
 
-
-
-/* ==== Buttons === */
+/* ==== Buttons ==== */
 .btn-primary {
   background-color: var(--pdogold) !important;
   border-color: var(--pdogold) !important;
@@ -59,7 +58,6 @@ header .text-muted {
 .btn-primary:hover {
   background-color: #b88f12 !important;
 }
-
 .btn-outline-secondary {
   color: var(--pdogold) !important;
   border-color: var(--pdogold) !important;
@@ -69,11 +67,12 @@ header .text-muted {
   color: #fff !important;
 }
 
-/* ==== Cards (Features) === */
+/* ==== Cards ==== */
 .card {
   border: none;
   background-color: #fafaf9;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 1rem;
 }
 .card:hover {
   transform: translateY(-5px);
@@ -85,28 +84,262 @@ header .text-muted {
 .card p {
   color: #fffdfd;
 }
-
 .card.shadow-sm.h-100 {
-  max-width: 320px;         
-  min-width: 250px;         
-  height: auto;            
-  margin: 0 auto;           
-  border-radius: 12px;     
-  overflow: hidden;         
+  width: 100%;
+  max-width: 320px;
+  min-width: auto;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
 }
-
 .card.shadow-sm.h-100 img {
-  height: 200px;            
-  object-fit: cover;        
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
 }
 
-
-/* ==== Footer === */
+/* ==== Footer ==== */
 footer {
   background-color: var(--pdogreen) !important;
-  color: #0f3c28;
+  padding: 1.5rem;
+  text-align: center;
 }
-footer p {
+footer .footer-text {
+  color: #fff !important;
+  font-size: 0.95rem;
   margin: 0;
-  font-size: 0.9rem;
+  font-weight: 400;
+}
+footer .footer-links a {
+  color: var(--pdogold) !important;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  display: inline-block;
+  margin: 0 0.25rem;
+}
+footer .footer-links a:hover {
+  color: #fff !important;
+}
+
+/* ==== Modals ==== */
+.modal-body {
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 1rem;
+}
+.modal-lg {
+  max-width: 95%;
+}
+
+/* ==== Forms ==== */
+#bookingForm .col-lg-6,
+#applyForm .col-lg-6 {
+  margin-bottom: 1rem;
+}
+.modal-body input,
+.modal-body select,
+.modal-body textarea {
+  font-size: 1rem;
+}
+
+/* ==== Buttons small screens ==== */
+.btn {
+  margin-bottom: 0.25rem;
+}
+@media (max-width: 575px) {
+  .btn {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.5rem;
+    width: 100%;
+  }
+}
+
+/* ==== Tables ==== */
+.table-responsive {
+  overflow-x: auto;
+}
+.table td, .table th {
+  vertical-align: middle;
+}
+@media (max-width: 575px) {
+  table {
+    font-size: 0.85rem;
+  }
+  .table td, .table th {
+    padding: 0.35rem 0.5rem;
+  }
+  .text-nowrap button {
+    white-space: normal;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+}
+
+/* ==== Images ==== */
+.card img,
+#tenantsCards img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* ==== Booking / Apply Forms ==== */
+#applyForm .card,
+#bookingForm .card {
+  padding: 1rem;
+}
+
+/* ==== Time slots ==== */
+.time-slot.btn-primary {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: white !important;
+}
+
+/* ==== Responsive Layout Tweaks ==== */
+@media (max-width: 991px) {
+  header h1 { font-size: 2rem; }
+  header p { font-size: 1rem; }
+}
+@media (max-width: 767px) {
+  #bookingForm .col-lg-6,
+  #applyForm .col-lg-6 {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  .card.shadow-sm.h-100 {
+    max-width: 100%;
+  }
+  /* Reduce card image height on small phones */
+  .card.shadow-sm.h-100 img {
+    height: auto;
+  }
+}
+@media (max-width: 575px) {
+  header h1 { font-size: 1.6rem; }
+  header p { font-size: 0.9rem; }
+}
+
+/* ==== Footer Links Stack on small screens ==== */
+@media (max-width: 575px) {
+  footer .footer-links a {
+    display: block;
+    margin: 0.25rem 0;
+  }
+}
+
+/* ==== Section padding tweak on small devices ==== */
+@media (max-width: 575px) {
+  header, section {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+}
+
+/* ==== Global layout ==== */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+main, .container {
+  flex-grow: 1;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* ==== Admin Dashboard Sidebar & Layout ==== */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: row;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  padding: 1rem;
+}
+
+/* Sidebar buttons */
+.sidebar .btn {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+/* Main content */
+.main-content {
+  flex-grow: 1;
+  padding: 1rem;
+  background-color: #f8f9fa;
+}
+
+/* Navbar overrides */
+.navbar {
+  background-color: var(--pdogreen) !important;
+}
+.navbar-brand, .btn-outline-light {
+  color: #fff !important;
+}
+
+/* Dashboard responsiveness */
+@media (max-width: 991px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #dee2e6;
+    padding: 0.5rem;
+  }
+  .main-content {
+    padding: 0.5rem;
+  }
+}
+
+/* Sidebar buttons on small screens */
+@media (max-width: 575px) {
+  .sidebar .btn {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.5rem;
+    width: 100%;
+  }
+}
+
+/* Tables on mobile */
+@media (max-width: 575px) {
+  table {
+    font-size: 0.85rem;
+  }
+  .table td, .table th {
+    padding: 0.25rem 0.35rem;
+  }
+  .text-nowrap button {
+    white-space: normal;
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+}
+
+/* Modals for small screens */
+.modal-fullscreen-sm-down {
+  max-width: 100%;
+  margin: 0;
+}
+.modal-body {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Cards/images responsive */
+.card img, #tenantsCards img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
 }
