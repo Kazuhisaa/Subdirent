@@ -23,3 +23,7 @@ Route::get('/admin/admin', function () {
 Route::get('/admin/units', function () {
     return view('admin.addUnit');
 })->name('admin.units');
+
+Route::get('/admin/tenants', function () {
+    return view('admin.addTenant');
+})->name('admin.tenants');
