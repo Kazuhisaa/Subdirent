@@ -20,10 +20,12 @@ return new class extends Migration
             $table->integer('floor_area')->nullable();
             $table->string('location');
             $table->decimal('price', 10, 2);
-            $table->boolean('is_rented')->default(false);   //  $table->date('available_from')->nullable(); 
+            $table->boolean('is_rented')->default(false);
+            $table->string('image')->nullable(); // <-- dito mo idagdag
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
