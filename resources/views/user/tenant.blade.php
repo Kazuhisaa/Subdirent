@@ -1,94 +1,127 @@
-<!DOCTYPE html>
-<html lang="en">
+@extends('layout.applys')
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tenant Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+@section('content')
+<div class="container my-4">
+  <h1 class="mb-4 text-dark fw-bold">Tenant Dashboard</h1>
 
-<body class="bg-light">
+  <!-- Tabs -->
+  <ul class="nav nav-tabs" id="tenantTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active text-dark" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile"
+        type="button" role="tab">Profile</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link text-dark" id="house-tab" data-bs-toggle="tab" data-bs-target="#house"
+        type="button" role="tab">House</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link text-dark" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments"
+        type="button" role="tab">Payments</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link text-dark" id="lease-tab" data-bs-toggle="tab" data-bs-target="#lease"
+        type="button" role="tab">Lease Agreement</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link text-dark" id="maintenance-tab" data-bs-toggle="tab" data-bs-target="#maintenance"
+        type="button" role="tab">Maintenance</button>
+    </li>
+  </ul>
 
-  <div class="container py-5">
-    <div class="row">
-
-      <!-- Profile Info -->
-      <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-body text-center">
-            <img src="{{ $tenant->image ? asset('uploads/tenants/'.$tenant->image) : 'https://via.placeholder.com/150' }}"
-              class="rounded-circle mb-3" width="120" height="120" alt="Profile Image">
-            <h4>{{ $tenant->first_name }} {{ $tenant->middle_name }} {{ $tenant->last_name }}</h4>
-            <p class="text-muted mb-1">{{ $tenant->email }}</p>
-            <p class="text-muted">{{ $tenant->contact }}</p>
-          </div>
-        </div>
+  <!-- Tab Contents -->
+  <div class="tab-content mt-3" id="tenantTabsContent">
+    <!-- Profile Tab -->
+    <div class="tab-pane fade show active" id="profile" role="tabpanel">
+      <div class="card p-3 bg-white shadow-sm">
+        <h4 class="text-dark fw-bold">Profile Information</h4>
+        <p class="text-dark"><strong>Name:</strong> {{ $tenant->first_name }} {{ $tenant->last_name }}</p>
+        <p class="text-dark"><strong>Email:</strong> {{ $tenant->email }}</p>
+        <p class="text-dark"><strong>Contact:</strong> {{ $tenant->contact }}</p>
       </div>
+    </div>
 
-      <!-- House + Lease + Payments -->
-      <div class="col-md-8">
-        <div class="card shadow-sm mb-3">
-          <div class="card-header bg-primary text-white">🏠 House Information</div>
-          <div class="card-body">
-            @if($tenant->unit)
-            <p><strong>Unit:</strong> {{ $tenant->unit->title }}</p>
-            <p><strong>Description:</strong> {{ $tenant->unit->description }}</p>
-            <p><strong>Monthly Rent:</strong> ₱{{ number_format($tenant->monthly_rent, 2) }}</p>
-            @else
-            <p class="text-danger">No unit assigned.</p>
-            @endif
-          </div>
-        </div>
+    <!-- House Tab -->
+    <div class="tab-pane fade" id="house" role="tabpanel">
+      <div class="card p-3 bg-white shadow-sm">
+        <h4 class="text-dark fw-bold">House Information</h4>
+        @if($tenant->unit)
+        <p class="text-dark"><strong>Title:</strong> {{ $tenant->unit->title }}</p>
+        <p class="text-dark"><strong>Location:</strong> {{ $tenant->unit->location ?? 'N/A' }}</p>
+        <p class="text-dark"><strong>Price:</strong> {{ $tenant->unit->price ?? 'N/A' }}</p>
+        @else
+        <p class="text-dark">No house assigned.</p>
+        @endif
+      </div>
+    </div>
 
-        <div class="card shadow-sm mb-3">
-          <div class="card-header bg-warning">📄 Lease Agreement</div>
-          <div class="card-body">
-            <p><strong>Lease Start:</strong> {{ $tenant->lease_start }}</p>
-            <p><strong>Lease End:</strong> {{ $tenant->lease_end }}</p>
-            <p><strong>Notes:</strong> {{ $tenant->notes ?? '—' }}</p>
-          </div>
-        </div>
+    <!-- Payments Tab -->
+    <div class="tab-pane fade" id="payments" role="tabpanel">
+      <div class="card p-3 bg-white shadow-sm">
+        <h4 class="text-dark fw-bold">Payments</h4>
+        @if($payments->isEmpty())
+        <p class="text-dark">No payments yet.</p>
+        @else
+        <table class="table table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>Date</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @foreach($payments as $payment)
+            <tr>
+              <td>{{ $payment->date }}</td>
+              <td>{{ $payment->amount }}</td>
+            </tr>
+            @endforeach
+          </tbody>
+        </table>
+        @endif
+      </div>
+    </div>
 
-        <div class="card shadow-sm">
-          <div class="card-header bg-success text-white">💰 Payment History</div>
-          <div class="card-body">
-            @if(isset($payments) && count($payments) > 0)
-            <div class="table-responsive">
-              <table class="table table-bordered">
-                <thead class="table-light">
-                  <tr>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @foreach($payments as $p)
-                  <tr>
-                    <td>{{ $p->payment_date }}</td>
-                    <td>₱{{ number_format($p->amount, 2) }}</td>
-                    <td>
-                      <span class="badge {{ $p->status == 'paid' ? 'bg-success' : 'bg-danger' }}">
-                        {{ ucfirst($p->status) }}
-                      </span>
-                    </td>
-                  </tr>
-                  @endforeach
-                </tbody>
-              </table>
-            </div>
-            @else
-            <p class="text-muted">No payments found.</p>
-            @endif
-          </div>
-        </div>
+    <!-- Lease Agreement Tab -->
+    <div class="tab-pane fade" id="lease" role="tabpanel">
+      <div class="card p-3 bg-white shadow-sm">
+        <h4 class="text-dark fw-bold">Lease Agreement</h4>
+        <p class="text-dark"><strong>Start Date:</strong> {{ $tenant->lease_start ?? 'N/A' }}</p>
+        <p class="text-dark"><strong>End Date:</strong> {{ $tenant->lease_end ?? 'N/A' }}</p>
+        <p class="text-dark"><strong>Monthly Rent:</strong> {{ $tenant->monthly_rent ?? 'N/A' }}</p>
+      </div>
+    </div>
 
+    <!-- Maintenance Tab -->
+    <div class="tab-pane fade" id="maintenance" role="tabpanel">
+      <div class="card p-3 bg-white shadow-sm">
+        <h4 class="text-dark fw-bold">Maintenance Requests</h4>
+        <p class="text-dark">No maintenance records yet. (Placeholder)</p>
       </div>
     </div>
   </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+<!-- Custom Styles -->
+<style>
+  .nav-tabs .nav-link.active {
+    background-color: #0d3b2e !important;
+    color: #fff !important;
+    font-weight: bold;
+  }
 
-</html>
+  .nav-tabs .nav-link {
+    color: #000 !important;
+  }
+
+  .card {
+    background-color: #fff !important;
+    color: #000 !important;
+  }
+
+  .card p,
+  .card h4,
+  .card strong {
+    color: #000 !important;
+  }
+</style>
+@endsection

@@ -106,4 +106,13 @@ class TenantController extends Controller
     $tenant->delete();
     return response()->json(['message' => 'Tenant deleted successfully']);
   }
+
+  public function dashboard($id)
+  {
+    $tenant = Tenant::with('unit')->findOrFail($id);
+    $payments = collect(); // No payments yet
+
+    // Point to your existing Blade file
+    return view('user.tenant', compact('tenant', 'payments'));
+  }
 }
