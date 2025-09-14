@@ -24,7 +24,7 @@
         <div class="modal-content">
           <div class="modal-header bg-primary text-white">
             <h5 class="modal-title">Add New Tenant</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close" data-bs-dismiss modal"></button>
           </div>
           <div class="modal-body">
             <form id="addTenantForm" enctype="multipart/form-data">
@@ -50,10 +50,10 @@
                   <label class="form-label">Contact</label>
                   <input type="text" class="form-control" name="contact" required>
                 </div>
-                <div class="col-md-6">
-                  <label class="form-label">House</label>
-                  <input type="text" class="form-control" name="house" required>
-                </div>
+                <label for="unitSelect">House / Unit</label>
+                <select id="unitSelect" name="unit_id" class="form-control">
+                  <option value="">-- Select House --</option>
+                </select>
                 <div class="col-md-6">
                   <label class="form-label">Monthly Rent</label>
                   <input type="number" class="form-control" name="monthly_rent" step="0.01" required>
@@ -158,8 +158,10 @@
                 <input type="text" class="form-control" name="contact" id="edit_contact" required>
               </div>
               <div class="col-md-6">
-                <label class="form-label">House</label>
-                <input type="text" class="form-control" name="house" id="edit_house" required>
+                <label class="form-label">House / Unit</label>
+                <select class="form-select" name="unit_id" id="edit_house" required>
+                  <option value="">-- Select House --</option>
+                </select>
               </div>
               <div class="col-md-6">
                 <label class="form-label">Monthly Rent</label>
@@ -197,6 +199,36 @@
   <script>
     const tenantsBody = document.getElementById('tenantsBody');
 
+    function loadUnits() {
+      fetch('/api/units/allunits')
+        .then(res => res.json())
+        .then(units => {
+          let unitSelect = document.getElementById('unitSelect');
+          unitSelect.innerHTML = '<option value="">-- Select Unit --</option>';
+          units.forEach(u => {
+            unitSelect.innerHTML += `<option value="${u.id}">${u.title}</option>`;
+          });
+        });
+
+
+    }
+
+    document.getElementById('unitSelect').addEventListener('change', function() {
+      let unitId = this.value;
+      if (unitId) {
+        fetch(`/api/units/findunit/${unitId}`)
+          .then(res => res.json())
+          .then(unit => {
+            document.querySelector('input[name="monthly_rent"]').value = unit.price ?? '';
+            document.querySelector('textarea[name="notes"]').value = unit.description ?? '';
+            document.querySelector('input[name="lease_start"]').value = '';
+            document.querySelector('input[name="lease_end"]').value = '';
+          });
+      }
+    });
+
+
+
     // Load tenants
     function loadTenants() {
       fetch('/api/tenants/allTenant')
@@ -209,7 +241,7 @@
   <td>${t.first_name} ${t.middle_name ?? ''} ${t.last_name}</td>
   <td>${t.email}</td>
   <td>${t.contact}</td>
-  <td>${t.house}</td>
+<td>${t.unit ? t.unit.title : '—'}</td>
   <td>₱${t.monthly_rent}</td>
   <td>${t.lease_start}</td>
   <td>${t.lease_end}</td>
@@ -258,7 +290,7 @@
     <h4>${t.first_name} ${t.middle_name ?? ''} ${t.last_name}</h4>
     <p><strong>Email:</strong> ${t.email}</p>
     <p><strong>Contact:</strong> ${t.contact}</p>
-    <p><strong>House:</strong> ${t.house}</p>
+<p><strong>House:</strong> ${t.unit ? t.unit.title : '—'}</p>
     <p><strong>Monthly Rent:</strong> ₱${t.monthly_rent}</p>
     <p><strong>Lease Start:</strong> ${t.lease_start}</p>
     <p><strong>Lease End:</strong> ${t.lease_end}</p>
@@ -268,6 +300,31 @@
           new bootstrap.Modal(document.getElementById('viewTenantModal')).show();
         });
     }
+
+    function loadEditUnits(selectedUnitId) {
+      fetch('/api/units/allunits')
+        .then(res => res.json())
+        .then(units => {
+          let editHouseSelect = document.getElementById('edit_house');
+          editHouseSelect.innerHTML = '<option value="">-- Select Unit --</option>';
+          units.forEach(u => {
+            editHouseSelect.innerHTML += `<option value="${u.id}" ${u.id == selectedUnitId ? 'selected' : ''}>
+          ${u.title}
+        </option>`;
+          });
+        });
+    }
+    document.getElementById('edit_house').addEventListener('change', function() {
+      let unitId = this.value;
+      if (unitId) {
+        fetch(`/api/units/findunit/${unitId}`)
+          .then(res => res.json())
+          .then(unit => {
+            document.getElementById('edit_monthly_rent').value = unit.price ?? '';
+            document.getElementById('edit_notes').value = unit.description ?? '';
+          });
+      }
+    });
 
     // Edit tenant
     function editTenant(id) {
@@ -280,11 +337,14 @@
           document.getElementById('edit_last_name').value = t.last_name;
           document.getElementById('edit_email').value = t.email;
           document.getElementById('edit_contact').value = t.contact;
-          document.getElementById('edit_house').value = t.house;
+          document.getElementById('edit_house').value = t.unit_id;
           document.getElementById('edit_monthly_rent').value = t.monthly_rent;
           document.getElementById('edit_lease_start').value = t.lease_start;
           document.getElementById('edit_lease_end').value = t.lease_end;
           document.getElementById('edit_notes').value = t.notes ?? '';
+
+          loadEditUnits(t.unit_id);
+
           new bootstrap.Modal(document.getElementById('editTenantModal')).show();
         });
     }
@@ -325,6 +385,7 @@
 
     // Initial load
     loadTenants();
+    loadUnits();
   </script>
 </body>
 

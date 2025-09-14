@@ -12,11 +12,17 @@ class Tenant extends Model
         'last_name',
         'email',
         'contact',
-        'house',
+        'unit_id',
         'monthly_rent',
         'lease_start',
         'lease_end',
         'image',
         'notes',
     ];
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class)->withDefault([
+            'title' => '—'
+        ]);
+    }
 }

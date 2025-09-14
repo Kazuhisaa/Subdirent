@@ -12,51 +12,55 @@ class TenantController extends Controller
   public function store(Request $request)
   {
     $fields = $request->validate([
-      'first_name'    => 'required|string|max:255',
-      'middle_name'   => 'nullable|string|max:255',
-      'last_name'     => 'required|string|max:255',
-      'email'         => 'required|email|max:255',
-      'contact'       => 'required|string|max:50',
-      'house'         => 'required|string|max:255',
-      'monthly_rent'  => 'required|numeric|min:0',
-      'lease_start'   => 'required|date',
-      'lease_end'     => 'required|date|after_or_equal:lease_start',
-      'notes'         => 'nullable|string',
-      'image'         => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+      'first_name'   => 'required|string|max:255',
+      'middle_name'  => 'nullable|string|max:255',
+      'last_name'    => 'required|string|max:255',
+      'email'        => 'required|email|unique:tenants,email',
+      'contact'      => 'nullable|string|max:20',
+      'unit_id'      => 'required|exists:units,id',
+      'monthly_rent' => 'nullable|numeric',
+      'lease_start'  => 'nullable|date',
+      'lease_end'    => 'nullable|date',
+      'notes'        => 'nullable|string',
+      'image'        => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
 
-    $imageName = null;
+    // Handle image upload
     if ($request->hasFile('image')) {
-      $imageName = time() . '.' . $request->image->extension();
-      $request->image->move(public_path('uploads/tenants'), $imageName);
+      $filename = time() . '.' . $request->image->extension();
+      $request->image->move(public_path('uploads/tenants'), $filename);
+      $fields['image'] = $filename;
     }
 
-    $tenant = Tenant::create([
-      'first_name'   => strip_tags($request->first_name),
-      'middle_name'  => strip_tags($request->middle_name),
-      'last_name'    => strip_tags($request->last_name),
-      'email'        => strip_tags($request->email),
-      'contact'      => strip_tags($request->contact),
-      'house'        => strip_tags($request->house),
-      'monthly_rent' => $request->monthly_rent,
-      'lease_start'  => $request->lease_start,
-      'lease_end'    => $request->lease_end,
-      'notes'        => strip_tags($request->notes),
-      'image'        => $imageName, // ✅ save uploaded filename
-    ]);
+    $tenant = Tenant::create($fields);
 
     return response()->json([
-      'message' => 'Tenant created successfully',
-      'tenant' => $tenant
-    ]);
+      'message' => 'Tenant added successfully',
+      'tenant'  => $tenant->load('unit')
+    ], 201);
   }
 
-  // Get all tenants
   public function index()
+  {
+    $tenants = Tenant::with('unit')->get();
+    return response()->json($tenants);
+  }
+
+  // Get all tenants with units
+  public function allTenant()
   {
     $tenants = Tenant::all();
     return response()->json($tenants);
   }
+
+
+  // Find single tenant with unit
+  public function findTenant($id)
+  {
+    $tenant = Tenant::with('unit')->findOrFail($id);
+    return response()->json($tenant);
+  }
+
 
   // Show tenant by id
   public function show($id)
@@ -74,7 +78,7 @@ class TenantController extends Controller
       'last_name'     => 'required|string|max:255',
       'email'         => 'required|email|max:255',
       'contact'       => 'required|string|max:50',
-      'house'         => 'required|string|max:255',
+      'unit_id' => 'required|exists:units,id',
       'monthly_rent'  => 'required|numeric|min:0',
       'lease_start'   => 'required|date',
       'lease_end'     => 'required|date|after_or_equal:lease_start',

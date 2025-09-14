@@ -18,7 +18,12 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('email')->unique();
             $table->string('contact')->nullable();
-            $table->string('house')->nullable();
+            $table->unsignedBigInteger('unit_id')->nullable();
+            $table->foreign('unit_id')
+                ->references('id')
+                ->on('units')
+                ->nullOnDelete(); // imbes na cascade
+
             $table->decimal('monthly_rent', 10, 2)->nullable();
             $table->date('lease_start')->nullable();
             $table->date('lease_end')->nullable();
