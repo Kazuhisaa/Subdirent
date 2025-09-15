@@ -6,13 +6,13 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/api/bookings/book-slot": {
+        "/api/booking/book-slot": {
             "get": {
                 "tags": [
                     "Booking"
                 ],
                 "summary": "Retrieve booked time slots for a given property and date",
-                "operationId": "ee017cd7ed39bb0480504c355698cae0",
+                "operationId": "93ba022571bff0b1b70fb7d8dec48fee",
                 "parameters": [
                     {
                         "name": "property_id",
@@ -68,13 +68,13 @@
                 }
             }
         },
-        "/api/bookings/schedule": {
+        "/api/booking/schedule": {
             "post": {
                 "tags": [
                     "Booking"
                 ],
                 "summary": "Create a new booking",
-                "operationId": "e260c585ce779300edb27d5db6382c80",
+                "operationId": "eed95ac839821e969fd2cf5c93f3d62a",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -149,6 +149,20 @@
                 }
             }
         },
+        "/api/revenue/prediction": {
+            "get": {
+                "tags": [
+                    "Revenue"
+                ],
+                "summary": "Get revenue prediction",
+                "operationId": "429730df2aa8df179afbf88d696484d1",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/api/test": {
             "get": {
                 "tags": [
@@ -168,6 +182,10 @@
         {
             "name": "Booking",
             "description": "Booking"
+        },
+        {
+            "name": "Revenue",
+            "description": "Revenue"
         },
         {
             "name": "Test",

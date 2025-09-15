@@ -6,6 +6,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\UnitsController;
 
 
+
 Route::get('/', function () {
     return view('welcome');
 })->name('home');

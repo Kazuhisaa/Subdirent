@@ -6,7 +6,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\UnitsController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\TenantController;
-
+use App\Http\Controllers\RevenuePredictionController;
 
 Route::prefix('booking')->group(function () {
     Route::get('/book-slot', [BookingController::class, 'getByDate']);
@@ -30,6 +30,10 @@ Route::prefix('tenants')->group(function () {
     Route::get('/findTenant/{id}', [TenantController::class, 'show']);
     Route::put('/updateTenant/{tenant}', [TenantController::class, 'update']);
     Route::delete('/deleteTenant/{tenant}', [TenantController::class, 'destroy']);
+});
+
+Route::prefix('revenue')->group(function () {
+    Route::get('/prediction', [RevenuePredictionController::class, 'getRevenuePrediction']);
 });
 
 Route::get('/test', [TestController::class, 'test']);

@@ -1,6 +1,6 @@
-    <?php
+<?php
 
-    namespace App\Http\Controllers;
+namespace App\Http\Controllers;
 
     use App\Http\Controllers\Controller;
     use Illuminate\Http\Request;
@@ -36,7 +36,7 @@
                 'floor_area' => $request->floor_area,
                 'location' => strip_tags($request->location),
                 'price' => strip_tags($request->price),
-                'image' => $imageName, // ✅ save filename
+                'image' => $imageName, 
             ]);
 
             return response()->json([
