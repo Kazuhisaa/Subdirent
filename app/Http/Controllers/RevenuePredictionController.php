@@ -22,10 +22,17 @@ class RevenuePredictionController extends Controller
     public function getRevenuePrediction(Request $request)
     {
         // Kunin lahat ng revenue prediction records mula sa model
-        $revenueDataset = RevenuePrediction::all();
+        $revenueDataset = json_decode(RevenuePrediction::all(), true);
+        $year_and_month[];
+        $revenue[];
 
+        foreeach($revenueDataset as $data){
+            
+        }
+
+        
         return response()->json([
-            'prediction' => $revenueDataset
+            'prediction' => 'revenue prediction data'
         ]);
     }
 }
