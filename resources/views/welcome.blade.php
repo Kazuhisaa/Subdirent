@@ -31,17 +31,62 @@
     </div>
 </nav>
 
-<!-- Banner -->
-<header class="bg-light py-5">
-    <div class="container text-center">
-        <h1 class="display-4 fw-bold">Welcome to Subdirent</h1>
-        <p class="lead text-muted">Manage tenants, payments, and units all in one place.</p>
-        <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
-            <a href="#units" class="btn btn-primary btn-lg">Get Started</a>
-            <a href="#" class="btn btn-outline-secondary btn-lg">Learn More</a>
+<!-- Banner with Carousel Background -->
+<header>
+    <div id="bannerCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <!-- First Slide -->
+            <div class="carousel-item active">
+                <img src="/images/back1.png" class="d-block w-100" alt="Unit 1"
+                    style="height: 500px; object-fit: cover;">
+                <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                    <div class="caption-bg p-4 rounded">
+                        <h1 class="display-4 fw-bold text-white">Welcome to Subdirent</h1>
+                        <p class="lead text-white-50">Manage tenants, payments, and units all in one place.</p>
+                        <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                            <a href="#units" class="btn btn-primary btn-lg">Get Started</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Second Slide -->
+            <div class="carousel-item">
+                <img src="/images/back2.png" class="d-block w-100" alt="Unit 2"
+                    style="height: 500px; object-fit: cover;">
+                <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                    <div class="caption-bg p-4 rounded">
+                        <h1 class="display-4 fw-bold text-white">Easy Tenant Management</h1>
+                        <p class="lead text-white-50">Track applications and keep records effortlessly.</p>
+                        <a href="#" class="btn btn-primary btn-lg">Book now</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Third Slide -->
+            <div class="carousel-item">
+                <img src="/images/back3.png" class="d-block w-100" alt="Unit 3"
+                    style="height: 500px; object-fit: cover;">
+                <div class="carousel-caption d-flex flex-column justify-content-center align-items-center h-100">
+                    <div class="caption-bg p-4 rounded">
+                        <h1 class="display-4 fw-bold text-white">Stay Organized</h1>
+                        <p class="lead text-white-50">Payments, units, tenants — all in one dashboard.</p>
+                        <a href="#footer" class="btn btn-primary btn-lg">Contact Us</a>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#bannerCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#bannerCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
     </div>
 </header>
+
 
 <!-- Available Units -->
 <section id="units" class="py-5 bg-light">
@@ -156,17 +201,78 @@ function showApplyForm(btn){
 </script>
 
 <!-- Footer -->
-<footer class="mt-auto" style="background-color: #0f3c28; padding:1.5rem 0; text-align:center;">
+<footer id="footer">
     <div class="container">
-        <p style="color:#fff; font-size:0.95rem; margin:0;">
-            © {{ date('Y') }} Subdirent. All rights reserved.
-        </p>
-        <p style="margin:0; font-size:0.95rem;">
-            <a href="#" style="color:#d4a017; text-decoration:none; font-weight:500; margin-right:0.5rem;">Privacy Policy</a>|
-            <a href="#" style="color:#d4a017; text-decoration:none; font-weight:500; margin-left:0.5rem;">Terms of Service</a>
-        </p>
+        <div class="row text-start text-md-start">
+            
+            <!-- Left Column: Location + Social + About Us -->
+            <div class="col-md-6 mb-3">
+                <h5 class="text-pdogold fw-bold mb-3">Our Location</h5>
+                <p class="footer-text">
+                    <i class="bi bi-geo-alt-fill text-pdogold me-2"></i>
+                    Pueblo de Oro Development Corporation<br>
+                    17th Floor Robinsons Summit Center,<br>
+                    6783 Ayala Avenue, Makati City 1226, Philippines
+                </p>
+
+                <h5 class="text-pdogold fw-bold mt-4 mb-2">Follow Us</h5>
+                <p class="footer-text mb-3">
+                    <span class="footer-links">
+                        <a href="#"><i class="bi bi-facebook me-1"></i>Facebook</a>
+                        <a href="#"><i class="bi bi-youtube me-1"></i>YouTube</a>
+                        <a href="#"><i class="bi bi-instagram me-1"></i>Instagram</a>
+                    </span>
+                </p>
+
+                <h5 class="text-pdogold fw-bold mt-4 mb-2">About Us</h5>
+                <p class="footer-text">
+                    Subdirent is a property management platform designed to make 
+                    renting easier for tenants and property owners. 
+                    We simplify tenant management, unit booking, and payments 
+                    all in one place.
+                </p>
+            </div>
+
+            <!-- Right Column: Contacts -->
+            <div class="col-md-6 mb-3">
+                <h5 class="text-pdogold fw-bold mb-3">Contact Us</h5>
+                <p class="footer-text">
+                    <strong><i class="bi bi-building text-pdogold me-2"></i>Head Office:</strong>
+                    +63 (2) 8790-2200
+                </p>
+                <p class="footer-text">
+                    <strong><i class="bi bi-geo-fill text-pdogold me-2"></i>Sto. Tomas, Batangas:</strong>
+                    +63 (2) 8736-3291 | +63 (43) 781-5841 | +63 (947) 998-0069
+                </p>
+                <p class="footer-text">
+                    <strong><i class="bi bi-geo-fill text-pdogold me-2"></i>Malvar, Batangas:</strong>
+                    +63 (2) 8400-6428 | +63 (917) 114-5856
+                </p>
+                <p class="footer-text">
+                    <strong><i class="bi bi-geo-fill text-pdogold me-2"></i>Pampanga:</strong>
+                    +63 (917) 833-6154 | +63 (947) 998-0078 | +63 (932) 855-0176
+                </p>
+                <p class="footer-text">
+                    <strong><i class="bi bi-geo-fill text-pdogold me-2"></i>Cagayan De Oro:</strong>
+                    +63 (88) 858-8976 | +63 (917) 102-8736
+                </p>
+                <p class="footer-text">
+           <strong><i class="bi bi-geo-fill text-pdogold me-2"></i>Cebu:</strong>
+                    +63 (32) 888-6146 | +63 (32) 341-5573 | +63 (917) 889-7966
+                </p>
+            </div>
+        </div>
+
+        <hr class="footer-divider">
+
+        <div class="text-center">
+            <p class="footer-text">© {{ date('Y') }} Subdirent. All rights reserved.</p>
+        </div>
     </div>
 </footer>
+
+<!-- Bootstrap Icons (make sure this is included in your layout) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
 footer a:hover {

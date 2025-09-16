@@ -48,6 +48,31 @@ header .text-muted {
   font-weight: 400;
   letter-spacing: 0.3px;
 }
+.caption-bg {
+  background: rgba(212, 160, 23, 0.60);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  max-width: 700px;
+  margin: auto;
+}
+.caption-bg h1,
+.caption-bg h3,
+.caption-bg h5 {
+  color: #fff !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+.caption-bg p {
+  color: #f0f0f0 !important;
+  font-size: 1.1rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+.unit-img {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
 /* ==== Buttons ==== */
 .btn-primary {
@@ -103,11 +128,12 @@ footer {
   background-color: var(--pdogreen) !important;
   padding: 1.5rem;
   text-align: center;
+  position: relative;
 }
 footer .footer-text {
   color: #fff !important;
   font-size: 0.95rem;
-  margin: 0;
+  margin: 0.3rem 0;
   font-weight: 400;
 }
 footer .footer-links a {
@@ -121,6 +147,34 @@ footer .footer-links a {
 footer .footer-links a:hover {
   color: #fff !important;
 }
+footer .footer-divider {
+  border-color: rgba(255, 255, 255, 0.2);
+  margin: 1rem 0;
+}
+.text-pdogold {
+  color: var(--pdogold) !important;
+}
+footer h5 {
+  color: var(--pdogold);
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+}
+footer .footer-links a {
+  display: inline-block;
+  margin-right: 1rem;
+}
+footer .footer-text {
+  line-height: 1.6;
+}
+/* Make links stack on small screens */
+@media (max-width: 575px) {
+  footer .footer-links a {
+    display: block;
+    margin: 0.25rem 0;
+  }
+}
+
+
 
 /* ==== Modals ==== */
 .modal-body {
