@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Tenant;
+use App\Models\Payment;
 
 class TenantController extends Controller
 {
@@ -32,11 +33,23 @@ class TenantController extends Controller
       $fields['image'] = $filename;
     }
 
+    // Create tenant
     $tenant = Tenant::create($fields);
 
+    // Create initial (first) payment record if lease_start and monthly_rent are set
+    if (!empty($tenant->lease_start) && !empty($tenant->monthly_rent)) {
+      Payment::create([
+        'tenant_id' => $tenant->id,
+        'amount'    => $tenant->monthly_rent,
+        'due_date'  => $tenant->lease_start,
+        'paid_at'   => $tenant->lease_start, // assume paid on lease start
+        'status'    => 'Paid',
+      ]);
+    }
+
     return response()->json([
-      'message' => 'Tenant added successfully',
-      'tenant'  => $tenant->load('unit')
+      'message' => 'Tenant added successfully with first payment recorded',
+      'tenant'  => $tenant->load('unit', 'payments'),
     ], 201);
   }
 
@@ -107,12 +120,11 @@ class TenantController extends Controller
     return response()->json(['message' => 'Tenant deleted successfully']);
   }
 
-  public function dashboard($id)
+  public function dashboard($tenantId)
   {
-    $tenant = Tenant::with('unit')->findOrFail($id);
-    $payments = collect(); // No payments yet
+    $tenant = \App\Models\Tenant::with('unit')->findOrFail($tenantId);
+    $payments = $tenant->payments()->latest()->get();
 
-    // Point to your existing Blade file
     return view('user.tenant', compact('tenant', 'payments'));
   }
 }

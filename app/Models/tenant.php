@@ -25,4 +25,9 @@ class Tenant extends Model
             'title' => '—'
         ]);
     }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
 }

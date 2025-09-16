@@ -7,6 +7,7 @@ use App\Http\Controllers\UnitsController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\RevenuePredictionController;
+use App\Http\Controllers\PaymentController;
 
 Route::prefix('booking')->group(function () {
     Route::get('/book-slot', [BookingController::class, 'getByDate']);
@@ -34,8 +35,19 @@ Route::prefix('tenants')->group(function () {
 
 Route::prefix('revenue')->group(function () {
     Route::get('/predictionMonth', [RevenuePredictionController::class, 'showRevenuePredictionMonthly']);
-    Route::get('/predictionQuarter',[RevenuePredictionController::class,'showRevenuePredictionQuarterly']);
-    Route::get('/predictionAnnual',[RevenuePredictionController::class,'showRevenuePredictionAnnualy']);
+    Route::get('/predictionQuarter', [RevenuePredictionController::class, 'showRevenuePredictionQuarterly']);
+    Route::get('/predictionAnnual', [RevenuePredictionController::class, 'showRevenuePredictionAnnualy']);
 });
+
+
+
+Route::post('/payments', [PaymentController::class, 'createPayment'])
+    ->name('payments.store');
+
+Route::post('/payments/webhook', [PaymentController::class, 'webhook'])
+    ->name('payments.webhook');
+
+Route::post('/tenant/{tenant}/payments', [PaymentController::class, 'createPayment'])
+    ->name('payments.store');
 
 Route::get('/test', [TestController::class, 'test']);

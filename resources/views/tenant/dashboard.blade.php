@@ -55,31 +55,119 @@
     </div>
 
     <!-- Payments Tab -->
+    <!-- Payments Tab -->
     <div class="tab-pane fade" id="payments" role="tabpanel">
       <div class="card p-3 bg-white shadow-sm">
-        <h4 class="text-dark fw-bold">Payments</h4>
+        <h4 class="text-dark fw-bold mb-3">Payments</h4>
+
+        <!-- Payment Summary -->
+        <div class="row mb-4">
+          <div class="col-md-4">
+            <div class="card shadow-sm p-3 text-center bg-light">
+              <h6 class="fw-bold text-dark">Total Due</h6>
+              <p class="fs-5 text-danger">₱{{ number_format($tenant->unit->price ?? 0, 2) }}</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card shadow-sm p-3 text-center bg-light">
+              <h6 class="fw-bold text-dark">Total Paid</h6>
+              <p class="fs-5 text-success">₱{{ number_format($payments->sum('amount'), 2) }}</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card shadow-sm p-3 text-center bg-light">
+              <h6 class="fw-bold text-dark">Outstanding Balance</h6>
+              <p class="fs-5 text-warning">₱{{ number_format(($tenant->unit->price ?? 0) - $payments->sum('amount'), 2) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Table -->
         @if($payments->isEmpty())
         <p class="text-dark">No payments yet.</p>
         @else
         <table class="table table-striped">
           <thead class="table-dark">
             <tr>
-              <th>Date</th>
+              <th>Month</th>
               <th>Amount</th>
+              <th>Status</th>
+              <th>Method</th>
+              <th>Reference</th>
             </tr>
           </thead>
           <tbody>
             @foreach($payments as $payment)
             <tr>
-              <td>{{ $payment->date }}</td>
-              <td>{{ $payment->amount }}</td>
+              <td>{{ \Carbon\Carbon::parse($payment->date)->format('F Y') }}</td>
+              <td>₱{{ number_format($payment->amount, 2) }}</td>
+              <td>
+                @if($payment->status == 'paid')
+                <span class="badge bg-success">Paid</span>
+                @elseif($payment->status == 'pending')
+                <span class="badge bg-warning">Pending</span>
+                @else
+                <span class="badge bg-danger">{{ ucfirst($payment->status) }}</span>
+                @endif
+              </td>
+              <td>{{ $payment->method ?? '-' }}</td>
+              <td>{{ $payment->reference ?? '-' }}</td>
             </tr>
             @endforeach
           </tbody>
+
         </table>
         @endif
+        <!-- Pay Now Button -->
+        <div class="mt-3 text-end">
+          <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#payNowModal">
+            💳 Pay Now
+          </button>
+        </div>
       </div>
     </div>
+
+    <!-- Pay Now Modal -->
+    <div class="modal fade" id="payNowModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-dark text-white">
+            <h5 class="modal-title">Make a Payment</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form action="{{ route('payments.create', ['tenant' => $tenant->id]) }}" method="POST">
+              @csrf
+              <div class="mb-3">
+                <label for="amount" class="form-label">Amount</label>
+                <input type="number" step="0.01" class="form-control" name="amount" required>
+              </div>
+              <div class="mb-3">
+                <label for="method" class="form-label">Payment Method</label>
+                <select class="form-select" name="method" required>
+                  <option value="Cash">Cash</option>
+                  <option value="GCash">GCash</option>
+                  <option value="Bank Transfer">Bank Transfer</option>
+                  <option value="PayPal">PayPal</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="reference" class="form-label">Reference No.</label>
+                <input type="text" class="form-control" name="reference">
+              </div>
+              <div class="mb-3">
+                <label for="notes" class="form-label">Notes</label>
+                <textarea class="form-control" name="notes" rows="2"></textarea>
+              </div>
+              <div class="text-end">
+                <button type="submit" class="btn btn-success">Submit Payment</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
 
     <!-- Lease Agreement Tab -->
     <div class="tab-pane fade" id="lease" role="tabpanel">
