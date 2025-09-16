@@ -11,4 +11,9 @@ class RevenuePrediction extends Model
         'month',
          'historical_revenue'
     ];
+
+
+    public function getPredictionMonth(){
+        
+    }
 }
