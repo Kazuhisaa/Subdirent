@@ -7,6 +7,9 @@ use App\Http\Controllers\UnitsController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\RevenuePredictionController;
+use App\Models\RevenuePrediction;
+use App\Services\RevenuePredictionService;
+
 
 Route::prefix('booking')->group(function () {
     Route::get('/book-slot', [BookingController::class, 'getByDate']);
@@ -36,6 +39,24 @@ Route::prefix('revenue')->group(function () {
     Route::get('/predictionMonth', [RevenuePredictionController::class, 'showRevenuePredictionMonthly']);
     Route::get('/predictionQuarter',[RevenuePredictionController::class,'showRevenuePredictionQuarterly']);
     Route::get('/predictionAnnual',[RevenuePredictionController::class,'showRevenuePredictionAnnualy']);
+});
+
+Route::get('/revenue/history', function () {
+    return RevenuePrediction::select('year', 'month', 'historical_revenue')
+        ->orderBy('year')
+        ->orderBy('month')
+        ->get();
+});
+
+Route::get('/revenue/prediction/{type}', function ($type, RevenuePredictionService $service) {
+    if ($type === 'month') {
+        return $service->predictMonthly();
+    } elseif ($type === 'quarter') {
+        return $service->predictQuarterly();
+    } elseif ($type === 'annual') {
+        return $service->predictAnnual();
+    }
+    return response()->json(['error' => 'Invalid type'], 400);
 });
 
 Route::get('/test', [TestController::class, 'test']);

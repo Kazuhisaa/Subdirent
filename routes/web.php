@@ -29,3 +29,8 @@ Route::get('/admin/addUnit', function () {
 Route::get('/admin/addTenant', function () {
     return view('admin.addTenant');
 })->name('admin.tenants');
+
+Route::get('/admin/analytics', function () {
+    return view('admin.analytics');
+})->name('admin.analytics');
+

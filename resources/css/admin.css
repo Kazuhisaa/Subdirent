@@ -1,0 +1,85 @@
+:root {
+  --pdogreen: #184d2b;
+  --pdogold: #ffc107;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.d-flex-full {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 60px; 
+  transition: width 0.3s;
+  overflow: hidden;
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  padding-top: 10px;
+}
+
+.sidebar.expanded,
+.sidebar:hover {
+  width: 220px; 
+}
+
+.sidebar .btn {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 10px;
+  transition: all 0.3s;
+}
+
+.sidebar .btn i {
+  margin-right: 0;
+  transition: margin 0.3s;
+}
+
+.sidebar.expanded .btn i,
+.sidebar:hover .btn i {
+  margin-right: 10px;
+}
+
+.sidebar .btn span {
+  display: none;
+}
+
+.sidebar.expanded .btn span,
+.sidebar:hover .btn span {
+  display: inline;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 20px;
+  transition: margin-left 0.3s;
+}
+
+/* Toggle button */
+#sidebarToggle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  background-color: var(--pdogreen);
+  border: none;
+  color: white;
+}
+
+/* Navbar styling */
+.navbar-custom {
+  background-color: var(--pdogreen);
+}
+
+/* Card hover */
+.card:hover {
+  transform: translateY(-3px);
+  transition: transform 0.2s;
+}
