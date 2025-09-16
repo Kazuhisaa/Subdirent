@@ -10,7 +10,7 @@ class BookingController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/bookings/book-slot",
+     *     path="/api/booking/book-slot",
      *     summary="Retrieve booked time slots for a given property and date",
      *     tags={"Booking"},
      *     @OA\Parameter(
@@ -68,7 +68,7 @@ class BookingController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/api/bookings/schedule",
+     *     path="/api/booking/schedule",
      *     summary="Create a new booking",
      *     tags={"Booking"},
      *     @OA\RequestBody(
