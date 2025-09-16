@@ -33,7 +33,9 @@ Route::prefix('tenants')->group(function () {
 });
 
 Route::prefix('revenue')->group(function () {
-    Route::get('/prediction', [RevenuePredictionController::class, 'getRevenuePrediction']);
+    Route::get('/predictionMonth', [RevenuePredictionController::class, 'showRevenuePredictionMonthly']);
+    Route::get('/predictionQuarter',[RevenuePredictionController::class,'showRevenuePredictionQuarterly']);
+    Route::get('/predictionAnnual',[RevenuePredictionController::class,'showRevenuePredictionAnnualy']);
 });
 
 Route::get('/test', [TestController::class, 'test']);
