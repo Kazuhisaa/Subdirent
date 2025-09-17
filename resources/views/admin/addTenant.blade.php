@@ -232,6 +232,23 @@
       });
   }
 
+  // Pag change ng location sa ADD FORM → filter units
+  locationSelect.addEventListener('change', function() {
+    let selectedLocation = this.value;
+
+    unitSelect.innerHTML = '<option value="">-- Select Unit --</option>';
+
+    if (selectedLocation) {
+      let filteredUnits = allUnits.filter(u => u.location === selectedLocation);
+
+      filteredUnits.forEach(u => {
+        unitSelect.innerHTML += `<option value="${u.id}" data-price="${u.price}">${u.title}</option>`;
+      });
+    }
+  });
+
+
+  // Pag change ng unit → auto-fill monthly rent
   unitSelect.addEventListener('change', function() {
     let selected = this.options[this.selectedIndex];
     let price = selected.getAttribute('data-price');
