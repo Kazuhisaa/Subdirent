@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\UnitsController;
+use App\Http\Controllers\PaymentController;
 
 
 
@@ -33,3 +34,7 @@ Route::get('/admin/addTenant', function () {
 Route::get('/admin/analytics', function () {
     return view('admin.analytics');
 })->name('admin.analytics');
+
+
+Route::get('/tenant/{tenant}/dashboard', [PaymentController::class, 'dashboard'])
+    ->name('tenant.dashboard');

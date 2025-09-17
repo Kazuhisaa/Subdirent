@@ -56,62 +56,87 @@
 
     <!-- Payments Tab -->
     <div class="tab-pane fade" id="payments" role="tabpanel">
-      <!-- Horizontal Summary -->
-      <div class="d-flex gap-3 mb-4 flex-wrap">
-        <div class="card p-3 text-center shadow-sm flex-fill">
-          <h6 class="fw-bold">Total Due</h6>
-          <p class="fs-6 text-danger mb-0">₱{{ number_format($tenant->unit->price ?? 0, 2) }}</p>
-        </div>
-        <div class="card p-3 text-center shadow-sm flex-fill">
-          <h6 class="fw-bold">Total Paid</h6>
-          <p class="fs-6 text-success mb-0">₱{{ number_format($payments->sum('amount'), 2) }}</p>
-        </div>
-        <div class="card p-3 text-center shadow-sm flex-fill">
-          <h6 class="fw-bold">Outstanding Balance</h6>
-          <p class="fs-6 text-warning mb-0">₱{{ number_format(($tenant->unit->price ?? 0) - $payments->sum('amount'), 2) }}</p>
-        </div>
-      </div>
-      <!-- Payment Schedule + Pay Now Box -->
-      <div class="d-flex gap-3 align-items-start flex-wrap">
-        <!-- Payment Schedule -->
-        <div class="flex-fill">
-          <div class="card p-3 shadow-sm" style="min-height: 200px;">
-            <h6 class="fw-bold mb-2">Payment Schedule</h6>
-            @if($nextMonth)
-            <div class="card p-3 shadow-sm mb-3">
-              <h6 class="fw-bold">Next Payment</h6>
-              <p>{{ \Carbon\Carbon::parse($nextMonth['month'])->format('F Y') }} - ₱{{ number_format($nextMonth['amount'], 2) }}</p>
+      <div class="container my-2">
+
+        <!-- Summary Cards -->
+        <div class="row mb-4 g-3">
+          <div class="col-md-4">
+            <div class="card text-center p-4 shadow-sm h- 150">
+              <h6 class="text-muted">Total Due</h6>
+              <h4>₱{{ number_format($totalDue, 2) }}</h4>
             </div>
-            @else
-            <p>All payments are complete.</p>
-            @endif
+          </div>
+          <div class="col-md-4">
+            <div class="card text-center p-4 shadow-sm h-150">
+              <h6 class="text-muted">Total Paid</h6>
+              <h4>₱{{ number_format($totalPaid, 2) }}</h4>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card text-center p-4 shadow-sm h-150">
+              <h6 class="text-muted">Outstanding Balance</h6>
+              <h4>₱{{ number_format($outstanding, 2) }}</h4>
+            </div>
           </div>
         </div>
 
-        <!-- Pay Now Box -->
-        <div style="width: 250px;">
-          <div class="card p-3 shadow-sm">
-            <h6 class="fw-bold mb-3">Make a Payment</h6>
-            <form action="{{ route('payments.create', ['tenant' => $tenant->id]) }}" method="POST">
-              @csrf
-              <div class="mb-2">
-                <label class="form-label">Amount</label>
-                <input type="number" step="0.01" class="form-control" name="amount" required>
-              </div>
-              <div class="mb-2">
-                <label class="form-label">Payment Method</label>
-                <select class="form-select" name="method" required>
-                  <option value="Cash">Cash</option>
-                  <option value="GCash">GCash</option>
-                  <option value="Bank Transfer">Bank Transfer</option>
-                  <option value="PayPal">PayPal</option>
-                </select>
-              </div>
-              <button type="submit" class="btn btn-success w-100 mt-2">💳 Pay Now</button>
-            </form>
+        <!-- Main Content Row -->
+        <div class="row g-4">
+          <!-- Left: Payment History -->
+          <div class="col-md-8 h-150">
+            <div class="card p-3 shadow-sm ">
+              <h5 class="mb-3">Payment History</h5>
+              <table class="table table-striped mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Month</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Method</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach($payments as $payment)
+                  <tr>
+                    <td>{{ \Carbon\Carbon::parse($payment->for_month)->format('F Y') ?? '-' }}</td>
+                    <td>₱{{ number_format($payment->amount, 2) }}</td>
+                    <td>{{ ucfirst($payment->status) }}</td>
+                    <td>{{ $payment->method }}</td>
+                    <td>{{ $payment->payment_date }}</td>
+                  </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Right: Pay Now Card -->
+          <div class="col-md-4">
+            <div class="card p-4 shadow-sm text-center">
+              <h5 class="mb-3">Next Payment</h5>
+              <p class="mb-2">{{ $nextMonth['date'] ?? 'Next Payment Date' }}</p>
+              <p class="h4 mb-3">₱{{ $nextMonth['amount'] ?? $tenant->monthly_rent }}</p>
+              <form method="POST" action="{{ route('payments.create', $tenant->id) }}">
+                @csrf
+                <div class="mb-3">
+                  <select class="form-select" name="payment_method" required>
+                    <option value="card">Credit/Debit Card</option>
+                    <option value="gcash">GCash</option>
+                  </select>
+                </div>
+                <button type="submit" class="btn btn-success w-100">
+                  Pay Now
+                </button>
+              </form>
+
+
+            </div>
           </div>
         </div>
+
       </div>
+
 
       <!-- Lease Agreement Tab -->
       <div class="tab-pane fade" id="lease" role="tabpanel">
@@ -156,4 +181,56 @@
       color: #000 !important;
     }
   </style>
+  @endsection
+
+  @section('scripts')
+  <script>
+    const autopayCheckbox = document.getElementById('autopayCheckbox');
+    const autopayOptions = document.getElementById('autopayOptions');
+    const paymentMethodSelect = document.getElementById('paymentMethodSelect');
+    const paymentDetails = document.getElementById('paymentDetails');
+    const gcashFields = document.getElementById('gcashFields');
+    const cardFields = document.getElementById('cardFields');
+
+    function togglePaymentDetails() {
+      const method = paymentMethodSelect.value;
+      paymentDetails.style.display = method ? 'block' : 'none';
+      gcashFields.style.display = method === 'gcash' ? 'block' : 'none';
+      cardFields.style.display = method === 'card' ? 'block' : 'none';
+    }
+
+    // Checkbox toggle
+    autopayCheckbox.addEventListener('change', function() {
+      autopayOptions.style.display = this.checked ? 'block' : 'none';
+      if (!this.checked) {
+        paymentDetails.style.display = 'none';
+        paymentMethodSelect.value = '';
+      } else {
+        togglePaymentDetails();
+      }
+    });
+
+    // Payment method select
+    paymentMethodSelect.addEventListener('change', togglePaymentDetails);
+
+    // Initialize display on page load
+    if (autopayCheckbox.checked) {
+      togglePaymentDetails();
+    }
+
+    // Form submit
+    document.getElementById('autopayForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      let formData = new FormData(this);
+      fetch(`/api/tenants/{{ $tenant->id }}/autopay`, {
+          method: 'POST',
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          alert('✅ Autopay settings saved!');
+        })
+        .catch(err => alert('❌ Error saving autopay settings'));
+    });
+  </script>
   @endsection

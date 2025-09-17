@@ -29,7 +29,7 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url('/features') }}">Features</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url('/units') }}">Units</a></li>
                     <li class="nav-item">
-                        <a class="btn btn-outline-light ms-lg-2 mt-2 mt-lg-0" href="{{ route('login') }}">Login</a>
+                        <a class="btn btn-outline-light ms-lg-2 mt-2 mt-lg-0" href="#">Login</a>
                     </li>
                 </ul>
             </div>

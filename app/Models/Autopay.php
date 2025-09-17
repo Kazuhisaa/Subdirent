@@ -5,22 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Payment extends Model
+class Autopay extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'tenant_id',
-        'amount',
-        'payment_date',
-        'status',
-        'method',
-        'reference',
-        'for_month',
-        'payment_date'
+        'enabled',
+        'payment_method',
+        'gcash_number',
+        'payment_token',
+        'autopay_day',
     ];
 
-    // Relationship: Payment belongs to a Tenant
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);

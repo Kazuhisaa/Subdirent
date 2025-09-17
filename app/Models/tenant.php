@@ -33,4 +33,9 @@ class Tenant extends Model
     {
         return $this->belongsTo(Unit::class);
     }
+
+    public function autopay()
+    {
+        return $this->hasOne(Autopay::class);
+    }
 }
