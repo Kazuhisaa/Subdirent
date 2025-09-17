@@ -32,20 +32,3 @@ Route::get('/admin/addUnit', function () {
 Route::get('/admin/tenants', function () {
     return view('admin.addTenant');
 })->name('admin.tenants');
-
-Route::get('/login', function () {
-    return 'Login page (placeholder)';
-})->name('login');
-
-
-Route::get('/tenant/{tenant}/dashboard', [PaymentController::class, 'dashboard'])
-    ->name('tenant.dashboard');
-
-Route::post('/tenant/{tenant}/pay', [PaymentController::class, 'createPayment'])
-    ->name('payments.create');
-
-Route::get('/tenant/{tenant}/payment/success', [PaymentController::class, 'success'])
-    ->name('payment.success');
-
-Route::get('/tenant/{tenant}/payment/cancel', [PaymentController::class, 'cancel'])
-    ->name('payment.cancel');
