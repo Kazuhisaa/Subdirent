@@ -38,7 +38,7 @@ class RevenuePredictionService
         // $r2 = RegressionMetric::r2Score($targets, $predictedAll);
 
         return [
-            'prediction for next month' => number_format($predicted,2)   
+            'prediction (monthly)' => number_format($predicted,2)   
         ];
     }
 
@@ -78,7 +78,7 @@ class RevenuePredictionService
         // $r2 = RegressionMetric::r2Score($targets, $predictedAll);
 
         return [
-            'prediction for next 3 months' => number_format($predicted,2)   
+            'prediction (quarterly)' => number_format($predicted,2)   
         ];
     }
 
@@ -139,8 +139,7 @@ class RevenuePredictionService
        $predictedAll = array_map(fn($x) => $regression->predict($x), $features);
         $r2 = RegressionMetric::r2Score($targets, $predictedAll);
           return [
-            'prediction for next 12 months' => number_format($predicted,2),
-           'r2_score' => round($r2, 2)
+            'prediction (Annually)' => number_format($predicted,2)
         ];
     }
 }

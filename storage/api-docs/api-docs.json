@@ -149,13 +149,41 @@
                 }
             }
         },
-        "/api/revenue/prediction": {
+        "/api/revenue/predictionMonth": {
             "get": {
                 "tags": [
                     "Revenue"
                 ],
-                "summary": "Get revenue prediction",
-                "operationId": "429730df2aa8df179afbf88d696484d1",
+                "summary": "Get revenue prediction monthly",
+                "operationId": "4658e86743b63f20ae3bd470e41ffdc1",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/revenue/predictionQuarter": {
+            "get": {
+                "tags": [
+                    "Revenue"
+                ],
+                "summary": "Get revenue prediction Quarterly",
+                "operationId": "b94a18afe86b5e6acff6d0786ee9119e",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/api/revenue/predictionAnnual": {
+            "get": {
+                "tags": [
+                    "Revenue"
+                ],
+                "summary": "Get revenue prediction Annualy",
+                "operationId": "709aa7a4df7df848cf1dbb3f3a85ba5e",
                 "responses": {
                     "200": {
                         "description": "OK"
