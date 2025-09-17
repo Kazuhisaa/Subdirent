@@ -55,95 +55,51 @@
     </div>
 
     <!-- Payments Tab -->
-    <!-- Payments Tab -->
     <div class="tab-pane fade" id="payments" role="tabpanel">
-      <div class="card p-3 bg-white shadow-sm">
-        <h4 class="text-dark fw-bold mb-3">Payments</h4>
-
-        <!-- Payment Summary -->
-        <div class="row mb-4">
-          <div class="col-md-4">
-            <div class="card shadow-sm p-3 text-center bg-light">
-              <h6 class="fw-bold text-dark">Total Due</h6>
-              <p class="fs-5 text-danger">₱{{ number_format($tenant->unit->price ?? 0, 2) }}</p>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card shadow-sm p-3 text-center bg-light">
-              <h6 class="fw-bold text-dark">Total Paid</h6>
-              <p class="fs-5 text-success">₱{{ number_format($payments->sum('amount'), 2) }}</p>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="card shadow-sm p-3 text-center bg-light">
-              <h6 class="fw-bold text-dark">Outstanding Balance</h6>
-              <p class="fs-5 text-warning">₱{{ number_format(($tenant->unit->price ?? 0) - $payments->sum('amount'), 2) }}</p>
-            </div>
-          </div>
+      <!-- Horizontal Summary -->
+      <div class="d-flex gap-3 mb-4 flex-wrap">
+        <div class="card p-3 text-center shadow-sm flex-fill">
+          <h6 class="fw-bold">Total Due</h6>
+          <p class="fs-6 text-danger mb-0">₱{{ number_format($tenant->unit->price ?? 0, 2) }}</p>
         </div>
-
-        <!-- Payment Table -->
-        @if($payments->isEmpty())
-        <p class="text-dark">No payments yet.</p>
-        @else
-        <table class="table table-striped">
-          <thead class="table-dark">
-            <tr>
-              <th>Month</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Method</th>
-              <th>Reference</th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach($payments as $payment)
-            <tr>
-              <td>{{ \Carbon\Carbon::parse($payment->date)->format('F Y') }}</td>
-              <td>₱{{ number_format($payment->amount, 2) }}</td>
-              <td>
-                @if($payment->status == 'paid')
-                <span class="badge bg-success">Paid</span>
-                @elseif($payment->status == 'pending')
-                <span class="badge bg-warning">Pending</span>
-                @else
-                <span class="badge bg-danger">{{ ucfirst($payment->status) }}</span>
-                @endif
-              </td>
-              <td>{{ $payment->method ?? '-' }}</td>
-              <td>{{ $payment->reference ?? '-' }}</td>
-            </tr>
-            @endforeach
-          </tbody>
-
-        </table>
-        @endif
-        <!-- Pay Now Button -->
-        <div class="mt-3 text-end">
-          <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#payNowModal">
-            💳 Pay Now
-          </button>
+        <div class="card p-3 text-center shadow-sm flex-fill">
+          <h6 class="fw-bold">Total Paid</h6>
+          <p class="fs-6 text-success mb-0">₱{{ number_format($payments->sum('amount'), 2) }}</p>
+        </div>
+        <div class="card p-3 text-center shadow-sm flex-fill">
+          <h6 class="fw-bold">Outstanding Balance</h6>
+          <p class="fs-6 text-warning mb-0">₱{{ number_format(($tenant->unit->price ?? 0) - $payments->sum('amount'), 2) }}</p>
         </div>
       </div>
-    </div>
-
-    <!-- Pay Now Modal -->
-    <div class="modal fade" id="payNowModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header bg-dark text-white">
-            <h5 class="modal-title">Make a Payment</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      <!-- Payment Schedule + Pay Now Box -->
+      <div class="d-flex gap-3 align-items-start flex-wrap">
+        <!-- Payment Schedule -->
+        <div class="flex-fill">
+          <div class="card p-3 shadow-sm" style="min-height: 200px;">
+            <h6 class="fw-bold mb-2">Payment Schedule</h6>
+            @if($nextMonth)
+            <div class="card p-3 shadow-sm mb-3">
+              <h6 class="fw-bold">Next Payment</h6>
+              <p>{{ \Carbon\Carbon::parse($nextMonth['month'])->format('F Y') }} - ₱{{ number_format($nextMonth['amount'], 2) }}</p>
+            </div>
+            @else
+            <p>All payments are complete.</p>
+            @endif
           </div>
-          <div class="modal-body">
+        </div>
+
+        <!-- Pay Now Box -->
+        <div style="width: 250px;">
+          <div class="card p-3 shadow-sm">
+            <h6 class="fw-bold mb-3">Make a Payment</h6>
             <form action="{{ route('payments.create', ['tenant' => $tenant->id]) }}" method="POST">
               @csrf
-              <div class="mb-3">
-                <label for="amount" class="form-label">Amount</label>
+              <div class="mb-2">
+                <label class="form-label">Amount</label>
                 <input type="number" step="0.01" class="form-control" name="amount" required>
               </div>
-              <div class="mb-3">
-                <label for="method" class="form-label">Payment Method</label>
+              <div class="mb-2">
+                <label class="form-label">Payment Method</label>
                 <select class="form-select" name="method" required>
                   <option value="Cash">Cash</option>
                   <option value="GCash">GCash</option>
@@ -151,65 +107,53 @@
                   <option value="PayPal">PayPal</option>
                 </select>
               </div>
-              <div class="mb-3">
-                <label for="reference" class="form-label">Reference No.</label>
-                <input type="text" class="form-control" name="reference">
-              </div>
-              <div class="mb-3">
-                <label for="notes" class="form-label">Notes</label>
-                <textarea class="form-control" name="notes" rows="2"></textarea>
-              </div>
-              <div class="text-end">
-                <button type="submit" class="btn btn-success">Submit Payment</button>
-              </div>
+              <button type="submit" class="btn btn-success w-100 mt-2">💳 Pay Now</button>
             </form>
           </div>
         </div>
       </div>
-    </div>
 
-
-    <!-- Lease Agreement Tab -->
-    <div class="tab-pane fade" id="lease" role="tabpanel">
-      <div class="card p-3 bg-white shadow-sm">
-        <h4 class="text-dark fw-bold">Lease Agreement</h4>
-        <p class="text-dark"><strong>Start Date:</strong> {{ $tenant->lease_start ?? 'N/A' }}</p>
-        <p class="text-dark"><strong>End Date:</strong> {{ $tenant->lease_end ?? 'N/A' }}</p>
-        <p class="text-dark"><strong>Monthly Rent:</strong> {{ $tenant->monthly_rent ?? 'N/A' }}</p>
+      <!-- Lease Agreement Tab -->
+      <div class="tab-pane fade" id="lease" role="tabpanel">
+        <div class="card p-3 bg-white shadow-sm">
+          <h4 class="text-dark fw-bold">Lease Agreement</h4>
+          <p class="text-dark"><strong>Start Date:</strong> {{ $tenant->lease_start ?? 'N/A' }}</p>
+          <p class="text-dark"><strong>End Date:</strong> {{ $tenant->lease_end ?? 'N/A' }}</p>
+          <p class="text-dark"><strong>Monthly Rent:</strong> {{ $tenant->monthly_rent ?? 'N/A' }}</p>
+        </div>
       </div>
-    </div>
 
-    <!-- Maintenance Tab -->
-    <div class="tab-pane fade" id="maintenance" role="tabpanel">
-      <div class="card p-3 bg-white shadow-sm">
-        <h4 class="text-dark fw-bold">Maintenance Requests</h4>
-        <p class="text-dark">No maintenance records yet. (Placeholder)</p>
+      <!-- Maintenance Tab -->
+      <div class="tab-pane fade" id="maintenance" role="tabpanel">
+        <div class="card p-3 bg-white shadow-sm">
+          <h4 class="text-dark fw-bold">Maintenance Requests</h4>
+          <p class="text-dark">No maintenance records yet. (Placeholder)</p>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Custom Styles -->
-<style>
-  .nav-tabs .nav-link.active {
-    background-color: #0d3b2e !important;
-    color: #fff !important;
-    font-weight: bold;
-  }
+  <!-- Custom Styles -->
+  <style>
+    .nav-tabs .nav-link.active {
+      background-color: #0d3b2e !important;
+      color: #fff !important;
+      font-weight: bold;
+    }
 
-  .nav-tabs .nav-link {
-    color: #000 !important;
-  }
+    .nav-tabs .nav-link {
+      color: #000 !important;
+    }
 
-  .card {
-    background-color: #fff !important;
-    color: #000 !important;
-  }
+    .card {
+      background-color: #fff !important;
+      color: #000 !important;
+    }
 
-  .card p,
-  .card h4,
-  .card strong {
-    color: #000 !important;
-  }
-</style>
-@endsection
+    .card p,
+    .card h4,
+    .card strong {
+      color: #000 !important;
+    }
+  </style>
+  @endsection

@@ -10,6 +10,7 @@ use App\Models\Payment;
 class TenantController extends Controller
 {
   // Add new tenant
+
   public function store(Request $request)
   {
     $fields = $request->validate([
@@ -33,25 +34,27 @@ class TenantController extends Controller
       $fields['image'] = $filename;
     }
 
-    // Create tenant
     $tenant = Tenant::create($fields);
 
-    // Create initial (first) payment record if lease_start and monthly_rent are set
-    if (!empty($tenant->lease_start) && !empty($tenant->monthly_rent)) {
-      Payment::create([
+    // Automatic first month payment
+    if ($tenant->lease_start && $tenant->monthly_rent) {
+      \App\Models\Payment::create([
         'tenant_id' => $tenant->id,
         'amount'    => $tenant->monthly_rent,
-        'due_date'  => $tenant->lease_start,
-        'paid_at'   => $tenant->lease_start, // assume paid on lease start
-        'status'    => 'Paid',
+        'payment_date' => now(),
+        'status'   => 'paid',
+        'method'   => 'Initial', // o Cash/Test
+        'reference' => 'First month auto-paid',
+        'for_month' => \Carbon\Carbon::parse($tenant->lease_start)->format('Y-m')
       ]);
     }
 
     return response()->json([
-      'message' => 'Tenant added successfully with first payment recorded',
-      'tenant'  => $tenant->load('unit', 'payments'),
+      'message' => 'Tenant added successfully with initial payment!',
+      'tenant'  => $tenant->load('unit', 'payments')
     ], 201);
   }
+
 
   public function index()
   {

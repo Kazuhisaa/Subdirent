@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Tenant extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'first_name',
         'middle_name',
@@ -18,16 +21,16 @@ class Tenant extends Model
         'lease_end',
         'image',
         'notes',
+        'image'
     ];
-    public function unit()
-    {
-        return $this->belongsTo(Unit::class)->withDefault([
-            'title' => '—'
-        ]);
-    }
 
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class);
     }
 }

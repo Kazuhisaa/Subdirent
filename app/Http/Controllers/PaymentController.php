@@ -9,12 +9,6 @@ use App\Models\Payment;
 
 class PaymentController extends Controller
 {
-  // Show tenant dashboard
-  public function dashboard(Tenant $tenant)
-  {
-    $payments = $tenant->payments()->orderBy('created_at', 'desc')->get();
-    return view('tenant.dashboard', compact('tenant', 'payments'));
-  }
 
   // Create payment (PayMongo test)
   public function createPayment(Tenant $tenant)
@@ -101,4 +95,32 @@ class PaymentController extends Controller
     }
     return response()->json(['status' => 'ok']);
   }
+  public function dashboard(Tenant $tenant)
+  {
+    $payments = $tenant->payments()->orderBy('created_at', 'desc')->get();
+
+    // Create a schedule of months between lease_start and lease_end
+    $schedule = [];
+    $nextMonth = null;
+
+    if ($tenant->lease_start && $tenant->lease_end) {
+      $start = \Carbon\Carbon::parse($tenant->lease_start)->startOfMonth();
+      $end   = \Carbon\Carbon::parse($tenant->lease_end)->startOfMonth();
+
+      while ($start <= $end) {
+        $monthKey = $start->format('Y-m');
+        $schedule[$monthKey] = $tenant->monthly_rent;
+
+        // Hanapin ang first unpaid month
+        if (!$nextMonth && !$payments->firstWhere('for_month', $monthKey)) {
+          $nextMonth = ['month' => $monthKey, 'amount' => $tenant->monthly_rent];
+        }
+
+        $start->addMonth();
+      }
+    }
+
+    return view('tenant.dashboard', compact('tenant', 'payments', 'schedule', 'nextMonth'));
+  }
 }
+  

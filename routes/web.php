@@ -41,7 +41,7 @@ Route::get('/login', function () {
 Route::get('/tenant/{tenant}/dashboard', [PaymentController::class, 'dashboard'])
     ->name('tenant.dashboard');
 
-Route::get('/tenant/{tenant}/pay', [PaymentController::class, 'createPayment'])
+Route::post('/tenant/{tenant}/pay', [PaymentController::class, 'createPayment'])
     ->name('payments.create');
 
 Route::get('/tenant/{tenant}/payment/success', [PaymentController::class, 'success'])

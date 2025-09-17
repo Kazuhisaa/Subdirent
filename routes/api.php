@@ -41,13 +41,18 @@ Route::prefix('revenue')->group(function () {
 
 
 
-Route::post('/payments', [PaymentController::class, 'createPayment'])
-    ->name('payments.store');
-
 Route::post('/payments/webhook', [PaymentController::class, 'webhook'])
     ->name('payments.webhook');
 
 Route::post('/tenant/{tenant}/payments', [PaymentController::class, 'createPayment'])
     ->name('payments.store');
+Route::post('/tenant/{tenant}/pay', [PaymentController::class, 'createPayment'])
+    ->name('payments.create');
+
+Route::get('/tenant/{tenant}/payment/success', [PaymentController::class, 'success'])
+    ->name('payment.success');
+
+Route::get('/tenant/{tenant}/payment/cancel', [PaymentController::class, 'cancel'])
+    ->name('payment.cancel');
 
 Route::get('/test', [TestController::class, 'test']);

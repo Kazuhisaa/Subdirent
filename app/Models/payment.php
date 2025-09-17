@@ -12,12 +12,14 @@ class Payment extends Model
     protected $fillable = [
         'tenant_id',
         'amount',
-        'due_date',
-        'paid_at',
+        'payment_date',
         'status',
+        'method',
+        'reference',
+        'for_month',
     ];
 
-    // Relationships
+    // Relationship: Payment belongs to a Tenant
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);
