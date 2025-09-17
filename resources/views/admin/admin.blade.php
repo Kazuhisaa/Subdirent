@@ -1,12 +1,15 @@
+<!-- resources/views/admin/admin.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SubdiRent Admin Dashboard</title>
+  <title>SubdiRent Admin</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   @vite(['resources/css/admin.css'])
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
   <style>
     :root {
       --pdogreen: #184d2b;
@@ -22,9 +25,8 @@
       min-height: 100vh;
     }
 
-    /* Sidebar */
     .sidebar {
-      width: 60px; /* collapsed */
+      width: 60px;
       transition: width 0.3s;
       overflow: hidden;
       background-color: #f8f9fa;
@@ -69,18 +71,19 @@
       transition: margin-left 0.3s;
     }
 
-    /* Toggle button */
-    #sidebarToggle {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 1000;
+    /* Fix sidebar text visibility for inactive links */
+    .sidebar .btn:not(.text-white) {
+      color: #184d2b;
+      background-color: #e9ecef;
+    }
+
+    .sidebar .btn.text-white {
+      color: #fff !important;
       background-color: var(--pdogreen);
-      border: none;
-      color: white;
     }
   </style>
 </head>
+
 <body class="bg-light">
 
   <!-- Navbar -->
@@ -96,78 +99,66 @@
   <div class="d-flex-full position-relative">
     <!-- Sidebar -->
     <div id="sidebar" class="sidebar d-flex flex-column p-2">
-      <a href="#" class="btn fw-semibold text-white" style="background-color: var(--pdogreen);">
+      <a href="{{ route('admin.dashboard') }}" class="btn fw-semibold">
         <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
       </a>
-      <a href="{{ route('admin.tenants') }}" class="btn btn-outline-success fw-semibold">
+      <a href="{{ route('admin.tenants') }}" class="btn fw-semibold">
         <i class="bi bi-people-fill"></i> <span>Tenants</span>
       </a>
-      <a href="{{ route('admin.units') }}" class="btn btn-outline-success fw-semibold">
+      <a href="{{ route('admin.units') }}" class="btn fw-semibold">
         <i class="bi bi-building"></i> <span>Units</span>
       </a>
-      <a href="#" class="btn btn-outline-success fw-semibold">
+      <a href="#" class="btn fw-semibold">
         <i class="bi bi-journal-check"></i> <span>Bookings</span>
       </a>
-      <a href="#" class="btn btn-outline-success fw-semibold">
+      <a href="#" class="btn fw-semibold">
         <i class="bi bi-cash-stack"></i> <span>Payments</span>
       </a>
-      <a href="#" class="btn btn-outline-success fw-semibold">
+      <a href="#" class="btn fw-semibold">
         <i class="bi bi-tools"></i> <span>Maintenance</span>
       </a>
-      <a href="{{ route('admin.analytics') }}" class="btn btn-outline-success fw-semibold mt-auto">
+      <a href="{{ route('admin.analytics') }}" class="btn fw-semibold">
         <i class="bi bi-graph-up"></i> <span>Analytics</span>
       </a>
     </div>
 
-    <!-- Toggle button -->
-    <button id="sidebarToggle"><i class="bi bi-list"></i></button>
+    <!-- Toggle button (absolute inside flex container) -->
+    <button id="sidebarToggle" style="position:absolute; top:10px; left:10px; z-index:1000; background-color: var(--pdogreen); border:none; color:white;">
+      <i class="bi bi-list"></i>
+    </button>
 
-    <!-- Main Content -->
+    <!-- Main content placeholder -->
     <div class="content">
-      <h3 class="mb-4 fw-bold" style="color: var(--pdogreen);">Admin Dashboard</h3>
-
-      <div class="row g-4">
-        <div class="col-md-4">
-          <div class="card shadow border-0">
-            <div class="card-body text-center">
-              <h5 class="card-title fw-bold" style="color: var(--pdogreen);">Total Tenants</h5>
-              <p class="display-6 fw-bold text-dark">120</p>
-              <button class="btn btn-sm text-white" style="background-color: var(--pdogreen);">View</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-4">
-          <div class="card shadow border-0">
-            <div class="card-body text-center">
-              <h5 class="card-title fw-bold" style="color: var(--pdogreen);">Available Units</h5>
-              <p class="display-6 fw-bold text-dark">45</p>
-              <button class="btn btn-sm btn-success">Manage</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-4">
-          <div class="card shadow border-0">
-            <div class="card-body text-center">
-              <h5 class="card-title fw-bold" style="color: var(--pdogreen);">Revenue</h5>
-              <p class="display-6 fw-bold text-dark">₱500k</p>
-              <button class="btn btn-sm btn-warning text-dark">Details</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      @yield('content')
     </div>
   </div>
+
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     const sidebar = document.getElementById('sidebar');
     const toggleBtn = document.getElementById('sidebarToggle');
 
-    toggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('expanded');
+    // Toggle sidebar expand/collapse
+    toggleBtn.addEventListener('click', () => sidebar.classList.toggle('expanded'));
+
+    // Sidebar link highlight on click (only <a> tags)
+    const sidebarLinks = sidebar.querySelectorAll('a');
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        // Remove highlight from all links
+        sidebarLinks.forEach(l => {
+          l.classList.remove('text-white');
+          l.style.backgroundColor = '';
+        });
+        // Highlight the clicked link
+        this.classList.add('text-white');
+        this.style.backgroundColor = 'var(--pdogreen)';
+      });
     });
   </script>
+
+  @yield('scripts')
 </body>
+
 </html>
