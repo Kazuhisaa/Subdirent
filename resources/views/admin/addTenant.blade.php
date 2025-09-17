@@ -155,11 +155,19 @@
                 <input type="text" class="form-control" name="contact" id="edit_contact" required>
               </div>
               <div class="col-md-6">
+                <label class="form-label">Location</label>
+                <select class="form-select" id="edit_location" required>
+                  <option value="">-- Select Location --</option>
+                </select>
+              </div>
+
+              <div class="col-md-6">
                 <label class="form-label">House / Unit</label>
                 <select class="form-select" name="unit_id" id="edit_unit" required>
                   <option value="">-- Select Unit --</option>
                 </select>
               </div>
+
               <div class="col-md-6">
                 <label class="form-label">Monthly Rent</label>
                 <input type="number" class="form-control" name="monthly_rent" id="edit_monthly_rent" step="0.01" required>
@@ -197,8 +205,9 @@
   let allUnits = [];
   const tenantsBody = document.getElementById('tenantsBody');
   const unitSelect = document.getElementById('unitSelect');
-  const editUnitSelect = document.getElementById('edit_unit');
   const locationSelect = document.getElementById('locationSelect');
+  const editLocationSelect = document.getElementById('edit_location');
+  const editUnitSelect = document.getElementById('edit_unit');
 
   function loadUnits() {
     fetch('/api/units/allunits')
@@ -208,26 +217,20 @@
 
         // Unique locations
         let locations = [...new Set(units.map(u => u.location))];
+
+        // For add form
         locationSelect.innerHTML = '<option value="">-- Select Location --</option>';
         locations.forEach(loc => {
           locationSelect.innerHTML += `<option value="${loc}">${loc}</option>`;
         });
+
+        // For edit form
+        editLocationSelect.innerHTML = '<option value="">-- Select Location --</option>';
+        locations.forEach(loc => {
+          editLocationSelect.innerHTML += `<option value="${loc}">${loc}</option>`;
+        });
       });
   }
-
-  locationSelect.addEventListener('change', function() {
-    let selectedLocation = this.value;
-
-    unitSelect.innerHTML = '<option value="">-- Select Unit --</option>';
-
-    if (selectedLocation) {
-      let filteredUnits = allUnits.filter(u => u.location === selectedLocation);
-
-      filteredUnits.forEach(u => {
-        unitSelect.innerHTML += `<option value="${u.id}" data-price="${u.price}">${u.title}</option>`;
-      });
-    }
-  });
 
   unitSelect.addEventListener('change', function() {
     let selected = this.options[this.selectedIndex];
@@ -236,6 +239,7 @@
       document.querySelector('input[name="monthly_rent"]').value = price;
     }
   });
+
 
   // Load tenants
   function loadTenants() {
@@ -307,6 +311,31 @@ ${t.image ? `<img src="/uploads/tenants/${t.image}" class="img-fluid rounded">` 
         new bootstrap.Modal(document.getElementById('viewTenantModal')).show();
       });
   }
+
+
+  // Pag change ng edit_location → filter units
+  editLocationSelect.addEventListener('change', function() {
+    let selectedLocation = this.value;
+
+    editUnitSelect.innerHTML = '<option value="">-- Select Unit --</option>';
+
+    if (selectedLocation) {
+      let filteredUnits = allUnits.filter(u => u.location === selectedLocation);
+
+      filteredUnits.forEach(u => {
+        editUnitSelect.innerHTML += `<option value="${u.id}" data-price="${u.price}">${u.title}</option>`;
+      });
+    }
+  });
+
+  // Pag change ng edit_unit → auto-fill price
+  editUnitSelect.addEventListener('change', function() {
+    let selected = this.options[this.selectedIndex];
+    let price = selected.getAttribute('data-price');
+    if (price) {
+      document.getElementById('edit_monthly_rent').value = price;
+    }
+  });
 
   // Edit tenant
   function editTenant(id) {
