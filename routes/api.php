@@ -9,6 +9,12 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\RevenuePredictionController;
 use App\Http\Controllers\OccupancyPredictionController;
 
+use App\Models\RevenuePrediction;
+use App\Services\RevenuePredictionService;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AutopayController;
+
+
 
 Route::prefix('booking')->group(function () {
     Route::get('/book-slot', [BookingController::class, 'getByDate']);
@@ -16,6 +22,8 @@ Route::prefix('booking')->group(function () {
     Route::get('/allBookings',[BookingController::class,'showAllBooking']);
     Route::get('/Testing', [BookingController::class, 'testApi']);
 });
+
+
 
 Route::prefix('units')->group(function () {
     Route::post('/newunit', [UnitsController::class, 'store']);
@@ -37,14 +45,52 @@ Route::prefix('tenants')->group(function () {
 
 Route::prefix('revenue')->group(function () {
     Route::get('/predictionMonth', [RevenuePredictionController::class, 'showRevenuePredictionMonthly']);
-    Route::get('/predictionQuarter',[RevenuePredictionController::class,'showRevenuePredictionQuarterly']);
-    Route::get('/predictionAnnual',[RevenuePredictionController::class,'showRevenuePredictionAnnualy']);
+    Route::get('/predictionQuarter', [RevenuePredictionController::class, 'showRevenuePredictionQuarterly']);
+    Route::get('/predictionAnnual', [RevenuePredictionController::class, 'showRevenuePredictionAnnualy']);
 });
 
+Route::get('/revenue/history', function () {
+    return RevenuePrediction::select('year', 'month', 'historical_revenue')
+        ->orderBy('year')
+        ->orderBy('month')
+        ->get();
+});
 
-Route::prefix('occupancy')->group(function(){
-    Route::get('/predictionMonth',[OccupancyPredictionController::class,'showOccupancyByMonth']);
-    Route::get('/predictionQuarter',[OccupancyPredictionController::class,'showOccupancyByQuarter']);
+Route::get('/revenue/prediction/{type}', function ($type, RevenuePredictionService $service) {
+    if ($type === 'month') {
+        return $service->predictMonthly();
+    } elseif ($type === 'quarter') {
+        return $service->predictQuarterly();
+    } elseif ($type === 'annual') {
+        return $service->predictAnnual();
+    }
+    return response()->json(['error' => 'Invalid type'], 400);
 });
 
 Route::get('/test', [TestController::class, 'test']);
+
+
+Route::get('/tenant/{tenant}/dashboard', [PaymentController::class, 'dashboard'])
+    ->name('tenant.dashboard');
+
+// Payment Routes
+Route::post('/tenant/{tenant}/pay', [PaymentController::class, 'createPayment'])
+    ->name('payments.create');
+
+Route::get('/tenant/{tenant}/payment/success', [PaymentController::class, 'success'])
+    ->name('payment.success');
+
+Route::get('/tenant/{tenant}/payment/cancel', [PaymentController::class, 'cancel'])
+    ->name('payment.cancel');
+
+// Webhook (PayMongo callback)
+Route::post('/api/paymongo/webhook', [PaymentController::class, 'webhook'])
+    ->name('payment.webhook');
+
+
+
+Route::prefix('tenants')->group(function () {
+    Route::post('{tenant}/autopay', [AutopayController::class, 'storeOrUpdate']);
+    Route::get('{tenant}/autopay', [AutopayController::class, 'show']);
+    Route::delete('{tenant}/autopay', [AutopayController::class, 'destroy']);
+});

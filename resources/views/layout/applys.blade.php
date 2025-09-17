@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +8,12 @@
 
     {{-- Bootstrap CSS + custom overrides --}}
     @vite([
-        'resources/bootstrap/css/bootstrap.min.css',
-        'resources/css/app.css',
-        'resources/js/app.js'
+    'resources/bootstrap/css/bootstrap.min.css',
+    'resources/css/app.css',
+    'resources/js/app.js'
     ])
 </head>
+
 <body class="d-flex flex-column min-vh-100 bg-light">
 
     {{-- Navbar --}}
@@ -27,7 +29,7 @@
                     <li class="nav-item"><a class="nav-link" href="{{ url('/features') }}">Features</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url('/units') }}">Units</a></li>
                     <li class="nav-item">
-                        <a class="btn btn-outline-light ms-lg-2 mt-2 mt-lg-0" href="{{ route('login') }}">Login</a>
+                        <a class="btn btn-outline-light ms-lg-2 mt-2 mt-lg-0" href="#">Login</a>
                     </li>
                 </ul>
             </div>
@@ -35,7 +37,7 @@
     </nav>
 
     {{-- Page Content --}}
-    <main class="flex-grow-1 container py-4">
+    <main>
         @yield('content')
     </main>
 
@@ -53,4 +55,5 @@
     {{-- Bootstrap JS --}}
     @vite(['resources/bootstrapjs/js/bootstrap.bundle.min.js'])
 </body>
+
 </html>

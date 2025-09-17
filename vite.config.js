@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js', 
                 'resources/bootstrapjs/js/bootstrap.bundle.min.js',
+                'resources/css/admin.css',
             ],
             refresh: true,
         }),
