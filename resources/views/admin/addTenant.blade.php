@@ -1,23 +1,51 @@
 @extends('admin.admin')
 
 @section('content')
-@php
-    $prefill = session('prefillTenant');
-@endphp
-<div class="container py-4">
-  <h2 class="mb-4">🧑‍💼 Admin - Manage Tenants</h2>
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="container py-4">
+    <h2 class="mb-4">
+      <i class="bi bi-people-fill me-2"></i> Admin - Manage Tenants
+    </h2>
 
-  <!-- Add Tenant Button -->
-  <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addTenantModal">
-    Add Tenant
-  </button>
+    <!-- Add Tenant Button -->
+    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addTenantModal">
+      <i class="bi bi-plus-circle me-1"></i> Add Tenant
+    </button>
+  </div>
+
+  <!-- Tenants Table -->
+  <div class="card shadow-sm mx-auto" style="max-width: 2500px;">
+    <div class="card-header bg-secondary text-white text-center">All Tenants</div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle text-center" id="tenantsTable">
+          <thead class="table-success text-center">
+            <tr>
+              <th>Full Name</th>
+              <th>Email</th>
+              <th>Contact</th>
+              <th>House</th>
+              <th>Monthly Rent</th>
+              <th>Lease Start</th>
+              <th>Lease End</th>
+              <th>Image</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tenantsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Add Tenant Modal -->
-  <div class="modal fade" id="addTenantModal" tabindex="-1" aria-labelledby="addTenantModalLabel">
+  <div class="modal fade" id="addTenantModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title" id="addTenantModalLabel">Add New Tenant</h5>
+          <h5 class="modal-title">Add New Tenant</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
@@ -78,35 +106,10 @@
               </div>
             </div>
             <div class="text-end mt-3">
-              <button type="submit" class="btn btn-primary">💾 Save Tenant</button>
+              <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i> Save Tenant</button>
             </div>
           </form>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tenants Table -->
-  <div class="card shadow-sm">
-    <div class="card-header bg-secondary text-white">All Tenants</div>
-    <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle" id="tenantsTable">
-          <thead class="table-light">
-            <tr>
-              <th>Full Name</th>
-              <th>Email</th>
-              <th>Contact</th>
-              <th>House</th>
-              <th>Monthly Rent</th>
-              <th>Lease Start</th>
-              <th>Lease End</th>
-              <th>Image</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tenantsBody"></tbody>
-        </table>
       </div>
     </div>
   </div>
@@ -132,74 +135,74 @@
           <h5 class="modal-title">Edit Tenant</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body">
-          <form id="editTenantForm" enctype="multipart/form-data">
-            @csrf
-            <input type="hidden" name="id" id="edit_id">
-            <div class="row g-3">
-              <div class="col-md-4">
-                <label class="form-label">First Name</label>
-                <input type="text" class="form-control" name="first_name" id="edit_first_name" required>
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Middle Name</label>
-                <input type="text" class="form-control" name="middle_name" id="edit_middle_name">
-              </div>
-              <div class="col-md-4">
-                <label class="form-label">Last Name</label>
-                <input type="text" class="form-control" name="last_name" id="edit_last_name" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Email</label>
-                <input type="email" class="form-control" name="email" id="edit_email" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Contact</label>
-                <input type="text" class="form-control" name="contact" id="edit_contact" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Location</label>
-                <select class="form-select" id="edit_location" required>
-                  <option value="">-- Select Location --</option>
-                </select>
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">House / Unit</label>
-                <select class="form-select" name="unit_id" id="edit_unit" required>
-                  <option value="">-- Select Unit --</option>
-                </select>
-              </div>
-
-              <div class="col-md-6">
-                <label class="form-label">Monthly Rent</label>
-                <input type="number" class="form-control" name="monthly_rent" id="edit_monthly_rent" step="0.01" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Lease Start</label>
-                <input type="date" class="form-control" name="lease_start" id="edit_lease_start" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Lease End</label>
-                <input type="date" class="form-control" name="lease_end" id="edit_lease_end" required>
-              </div>
-              <div class="col-md-12">
-                <label class="form-label">Notes</label>
-                <textarea class="form-control" name="notes" rows="3" id="edit_notes"></textarea>
-              </div>
-              <div class="col-md-12">
-                <label class="form-label">Upload Image</label>
-                <input type="file" class="form-control" name="image" id="edit_image" accept="image/*">
-              </div>
+        <div class="modal-body" id="editTenantBody"></div>
+        <form id="editTenantForm" enctype="multipart/form-data">
+          @csrf
+          <input type="hidden" name="id" id="edit_id">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control" name="first_name" id="edit_first_name" required>
             </div>
-            <div class="text-end mt-3">
-              <button type="submit" class="btn btn-warning">✏️ Update Tenant</button>
+            <div class="col-md-4">
+              <label class="form-label">Middle Name</label>
+              <input type="text" class="form-control" name="middle_name" id="edit_middle_name">
             </div>
-          </form>
-        </div>
+            <div class="col-md-4">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control" name="last_name" id="edit_last_name" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" name="email" id="edit_email" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Contact</label>
+              <input type="text" class="form-control" name="contact" id="edit_contact" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Location</label>
+              <select class="form-select" id="edit_location" required>
+                <option value="">-- Select Location --</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">House / Unit</label>
+              <select class="form-select" name="unit_id" id="edit_unit" required>
+                <option value="">-- Select Unit --</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Monthly Rent</label>
+              <input type="number" class="form-control" name="monthly_rent" id="edit_monthly_rent" step="0.01" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Lease Start</label>
+              <input type="date" class="form-control" name="lease_start" id="edit_lease_start" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Lease End</label>
+              <input type="date" class="form-control" name="lease_end" id="edit_lease_end" required>
+            </div>
+            <div class="col-md-12">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control" name="notes" rows="3" id="edit_notes"></textarea>
+            </div>
+            <div class="col-md-12">
+              <label class="form-label">Upload Image</label>
+              <input type="file" class="form-control" name="image" id="edit_image" accept="image/*">
+            </div>
+          </div>
+          <div class="text-end mt-3">
+            <button type="submit" class="btn btn-warning">✏️ Update Tenant</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</div>
 </div>
 @endsection
 
@@ -299,7 +302,7 @@
     fetch('/api/tenants/newTenant', {
         method: 'POST',
         headers: {
-        'Accept': 'application/json'
+          'Accept': 'application/json'
         },
         body: formData
       })
@@ -394,7 +397,7 @@ ${t.image ? `<img src="/uploads/tenants/${t.image}" class="img-fluid rounded">` 
     fetch(`/api/tenants/updateTenant/${id}`, {
         method: 'POST',
         headers: {
-        'Accept': 'application/json'
+          'Accept': 'application/json'
         },
         body: formData
       })
@@ -411,9 +414,9 @@ ${t.image ? `<img src="/uploads/tenants/${t.image}" class="img-fluid rounded">` 
   function deleteTenant(id) {
     if (confirm('Are you sure you want to delete this tenant?')) {
       fetch(`/api/tenants/deleteTenant/${id}`, {
-          method: 'DELETE'
+          method: 'DELETE',
           headers: {
-          'Accept': 'application/json'
+            'Accept': 'application/json'
           },
         })
         .then(res => res.json())
@@ -429,74 +432,5 @@ ${t.image ? `<img src="/uploads/tenants/${t.image}" class="img-fluid rounded">` 
   loadTenants();
 </script>
 
-{{-- Prefill when redirected from ApplicationController::accept --}}
-@if(session('prefillTenant'))
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const app = @json(session('prefillTenant'));
-    window.__pendingTenantPrefill = app;
 
-    // Prefill text fields
-    document.querySelector('#addTenantForm input[name="first_name"]').value = app.first_name ?? '';
-    document.querySelector('#addTenantForm input[name="middle_name"]').value = app.middle_name ?? '';
-    document.querySelector('#addTenantForm input[name="last_name"]').value = app.surname ?? '';
-    document.querySelector('#addTenantForm input[name="email"]').value = app.email ?? '';
-    document.querySelector('#addTenantForm input[name="contact"]').value = app.contact_number ?? '';
-    document.querySelector('#addTenantForm input[name="monthly_rent"]').value = app.price ?? '';
-    document.querySelector('#addTenantForm input[name="lease_start"]').value = app.lease_start ?? '';
-
-    // Lease end auto-calc
-    if(app.lease_start && app.lease_duration) {
-        let s = new Date(app.lease_start);
-        s.setMonth(s.getMonth() + parseInt(app.lease_duration));
-        document.querySelector('#addTenantForm input[name="lease_end"]').value = s.toISOString().split('T')[0];
-    }
-
-    // Show preview of uploaded ID from application
-    if (app.id_file) {
-        let previewDiv = document.createElement('div');
-        previewDiv.classList.add('mt-2');
-        previewDiv.innerHTML = `
-          <p><strong>Uploaded ID from Application:</strong></p>
-          <img src="/uploads/applications/${app.id_file}" alt="Uploaded ID" class="img-fluid rounded" style="max-width:200px;">
-        `;
-        document.querySelector('#addTenantForm input[name="image"]').insertAdjacentElement('afterend', previewDiv);
-
-        // Hidden input → so it's included when saving tenant
-        let hidden = document.createElement('input');
-        hidden.type = 'hidden';
-        hidden.name = 'prefilled_image';
-        hidden.value = app.id_file;
-        document.getElementById('addTenantForm').appendChild(hidden);
-    }
-
-    // Open modal
-    new bootstrap.Modal(document.getElementById('addTenantModal')).show();
-});
-
-// Prefill location + unit AFTER units are loaded
-function prefillUnitAndLocation() {
-    const app = window.__pendingTenantPrefill;
-    if (!app) return;
-    if (!window.allUnits || !app.unit_id) return;
-
-    const unitObj = window.allUnits.find(u => u.id == app.unit_id);
-    if (unitObj) {
-        // Set location
-        document.getElementById('locationSelect').value = unitObj.location;
-        document.getElementById('locationSelect').dispatchEvent(new Event('change'));
-
-        // Wait for units to load into dropdown
-        setTimeout(() => {
-            document.getElementById('unitSelect').value = app.unit_id;
-            document.getElementById('unitSelect').dispatchEvent(new Event('change'));
-        }, 200);
-    }
-}
-</script>
-@endif
-
-
-
-</script>
 @endsection

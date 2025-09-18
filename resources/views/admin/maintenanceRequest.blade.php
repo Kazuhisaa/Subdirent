@@ -1,16 +1,16 @@
 @extends('admin.admin')
 
 @section('content')
-<div class="container py-4">
-  <h2 class="mb-4">🛠️ Admin - Maintenance Requests</h2>
+<div class="container-fluid py-0">
+  <h2 class="mb-4"><i class="bi bi-tools me-6"></i> Admin - Maintenance Requests</h2>
 
-  <!-- Maintenance Requests Table -->
-  <div class="card shadow-sm">
-    <div class="card-header bg-secondary text-white">All Requests</div>
+  <!-- Requests Table -->
+  <div class="card shadow-sm mx-auto" style="max-width: 1500px;">
+    <div class="card-header bg-secondary text-white text-center">All Requests</div>
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table table-hover align-middle" id="requestsTable">
-          <thead class="table-light">
+        <table class="table table-hover align-middle text-center" id="requestsTable">
+          <thead class="table-success">
             <tr>
               <th>Tenant</th>
               <th>House</th>
@@ -29,11 +29,11 @@
   </div>
 
   <!-- View Request Modal -->
-  <div class="modal fade" id="viewRequestModal" tabindex="-1" aria-labelledby="viewRequestModalLabel">
+  <div class="modal fade" id="viewRequestModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header bg-info text-white">
-          <h5 class="modal-title" id="viewRequestModalLabel">View Maintenance Request</h5>
+          <h5 class="modal-title">View Maintenance Request</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body" id="viewRequestBody"></div>
@@ -42,11 +42,11 @@
   </div>
 
   <!-- Edit Request Modal -->
-  <div class="modal fade" id="editRequestModal" tabindex="-1" aria-labelledby="editRequestModalLabel">
+  <div class="modal fade" id="editRequestModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header bg-warning text-white">
-          <h5 class="modal-title" id="editRequestModalLabel">Edit Maintenance Request</h5>
+          <h5 class="modal-title">Edit Maintenance Request</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">

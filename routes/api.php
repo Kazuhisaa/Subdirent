@@ -8,12 +8,11 @@ use App\Http\Controllers\TenantController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\RevenuePredictionController;
 use App\Http\Controllers\OccupancyPredictionController;
-
 use App\Models\RevenuePrediction;
 use App\Services\RevenuePredictionService;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AutopayController;
-
+use App\Http\Controllers\MaintenanceRequestController;
 
 
 Route::prefix('booking')->group(function () {

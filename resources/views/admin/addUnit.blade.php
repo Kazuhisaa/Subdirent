@@ -1,74 +1,21 @@
 @extends('admin.admin')
 
 @section('content')
-<div class="container py-4">
-  <h2 class="mb-4">🏠 Admin - Manage Units</h2>
+<div class="container-fluid py-4">
+  <h2 class="mb-4"><i class="bi bi-building me-2"></i> Admin - Manage Units</h2>
 
   <!-- Add Unit Button -->
   <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addUnitModal">
-    Add Unit
+    <i class="bi bi-plus-circle me-1"></i> Add Unit
   </button>
 
-  <!-- Add Unit Modal -->
-  <div class="modal fade" id="addUnitModal" tabindex="-1" aria-labelledby="addUnitModalLabel">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header bg-primary text-white">
-          <h5 class="modal-title" id="addUnitModalLabel">Add New Unit</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="addUnitForm" enctype="multipart/form-data">
-            @csrf
-            <div class="mb-3">
-              <label class="form-label">Title</label>
-              <input type="text" name="title" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Location</label>
-              <input type="text" name="location" class="form-control">
-            </div>
-            <div class="row">
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Bedrooms</label>
-                <input type="number" name="bedrooms" class="form-control">
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Bathrooms</label>
-                <input type="number" name="bathrooms" class="form-control">
-              </div>
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Floor Area</label>
-                <input type="number" name="floor_area" class="form-control">
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Price</label>
-              <input type="number" step="0.01" name="price" class="form-control">
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Description</label>
-              <textarea name="description" class="form-control" rows="3" required></textarea>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label">Image</label>
-              <input type="file" name="image" class="form-control">
-            </div>
-            <button type="submit" class="btn btn-primary">Save Unit</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Units Table -->
-  <div class="card shadow-sm">
-    <div class="card-header bg-secondary text-white">All Units</div>
+  <div class="card shadow-sm mx-auto" style="max-width: 1800px;">
+    <div class="card-header bg-secondary text-white text-center">All Units</div>
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table table-hover align-middle" id="unitsTable">
-          <thead class="table-light">
+        <table class="table table-hover align-middle text-center" id="unitsTable">
+          <thead class="table-success">
             <tr>
               <th>Title</th>
               <th>Location</th>
@@ -86,27 +33,79 @@
     </div>
   </div>
 
-  <!-- View Unit Modal -->
-  <div class="modal fade" id="viewUnitModal" tabindex="-1" aria-labelledby="viewUnitModalLabel">
+  <!-- Add Unit Modal -->
+  <div class="modal fade" id="addUnitModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
-        <div class="modal-header bg-info text-white">
-          <h5 class="modal-title" id="viewUnitModalLabel">View Unit</h5>
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Add New Unit</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body" id="viewUnitBody">
-          <!-- dynamic content from JS -->
+        <div class="modal-body">
+          <form id="addUnitForm" enctype="multipart/form-data">
+            @csrf
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Title</label>
+                <input type="text" name="title" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Location</label>
+                <input type="text" name="location" class="form-control">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Bedrooms</label>
+                <input type="number" name="bedrooms" class="form-control">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Bathrooms</label>
+                <input type="number" name="bathrooms" class="form-control">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Floor Area</label>
+                <input type="number" name="floor_area" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Price</label>
+                <input type="number" step="0.01" name="price" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Image</label>
+                <input type="file" name="image" class="form-control">
+              </div>
+              <div class="col-12">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" rows="3" required></textarea>
+              </div>
+            </div>
+            <div class="text-end mt-3">
+              <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i> Save Unit</button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- View Unit Modal -->
+  <div class="modal fade" id="viewUnitModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title">Unit Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="viewUnitBody"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Edit Unit Modal -->
-  <div class="modal fade" id="editUnitModal" tabindex="-1" aria-labelledby="editUnitModalLabel">
+  <div class="modal fade" id="editUnitModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header bg-warning text-white">
-          <h5 class="modal-title" id="editUnitModalLabel">Edit Unit</h5>
+          <h5 class="modal-title">Edit Unit</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">

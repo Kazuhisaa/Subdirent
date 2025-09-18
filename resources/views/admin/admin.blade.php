@@ -112,6 +112,9 @@
       <a href="{{ route('admin.bookings') }}" class="btn fw-semibold">
         <i class="bi bi-journal-check"></i> <span>Bookings</span>
       </a>
+      <a href="{{ route('admin.applications') }}" class="btn fw-semibold">
+        <i class="bi bi-journal-check"></i> <span>Applications</span>
+      </a>
       <a href="{{ route('admin.payments') }}" class="btn fw-semibold">
         <i class="bi bi-cash-stack"></i> <span>Payments</span>
       </a>
