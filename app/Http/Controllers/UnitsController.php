@@ -93,4 +93,10 @@ class UnitsController extends Controller
         $unit->delete();
         return response()->json(['message' => 'Unit deleted successfully']);
     }
+
+    public function listView()
+    {
+        $units = Unit::all();
+        return view('welcome', compact('units')); // ipapasa sa welcome.blade.php
+    }
 }

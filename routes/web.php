@@ -55,3 +55,6 @@ Route::get('/tenant/{tenant}/payment/success', [PaymentController::class, 'succe
 
 Route::get('/tenant/{tenant}/payment/cancel', [PaymentController::class, 'cancel'])
     ->name('payment.cancel');
+
+
+Route::get('/', [UnitsController::class, 'listView'])->name('home');
