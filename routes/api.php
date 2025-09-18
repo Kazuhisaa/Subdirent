@@ -43,28 +43,33 @@ Route::prefix('tenants')->group(function () {
 });
 
 Route::prefix('revenue')->group(function () {
+    //prediction Monthly
     Route::get('/predictionMonth', [RevenuePredictionController::class, 'showRevenuePredictionMonthly']);
+    //prediction Quarterly
     Route::get('/predictionQuarter', [RevenuePredictionController::class, 'showRevenuePredictionQuarterly']);
+    // prediction annually
     Route::get('/predictionAnnual', [RevenuePredictionController::class, 'showRevenuePredictionAnnualy']);
+      //get all the date at historical revenue para maipakita sa graph
+      Route::get('/history',[RevenuePredictionController::class,'showRevenueHistory']);
+      
+      Route::get('/error',[RevenuePredictionController::class,'showError']);
 });
 
-Route::get('/revenue/history', function () {
-    return RevenuePrediction::select('year', 'month', 'historical_revenue')
-        ->orderBy('year')
-        ->orderBy('month')
-        ->get();
-});
+ 
+Route::prefix('occupancy')->group(function(){
 
-Route::get('/revenue/prediction/{type}', function ($type, RevenuePredictionService $service) {
-    if ($type === 'month') {
-        return $service->predictMonthly();
-    } elseif ($type === 'quarter') {
-        return $service->predictQuarterly();
-    } elseif ($type === 'annual') {
-        return $service->predictAnnual();
-    }
-    return response()->json(['error' => 'Invalid type'], 400);
+    //predict next month
+     Route::get('/predictionMonth',[OccupancyPredictionController::class,'showOccupancyByMonth']);
+     //predict quarter
+     Route::get('/predictionQuarter',[OccupancyPredictionController::class,'showOccupancyByQuarter']);
+     //predict Annual
+      Route::get('/predictionAnnual',[OccupancyPredictionController::class,'showOccupancyByAnnual']);
+ //get all the date at historical revenue para maipakita sa graph
+      Route::get('/history',[OccupancyPredictionController::class,'showRevenueHistory']);
+    
 });
+ 
+
 
 Route::get('/test', [TestController::class, 'test']);
 

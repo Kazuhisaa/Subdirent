@@ -19,92 +19,92 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  let chartInstance;
+let chartInstance;
 
-  async function loadPrediction(type) {
-    let url = '',
-      label = '';
-    if (type === 'month') {
-      url = "/api/revenue/predictionMonth";
-      label = "Next Month";
-    } else if (type === 'quarter') {
-      url = "/api/revenue/predictionQuarter";
-      label = "Next Quarter";
-    } else if (type === 'annual') {
-      url = "/api/revenue/predictionAnnual";
-      label = "Next Year";
-    }
+async function loadPrediction(type) {
+  let predictionUrl = '';
+  let historyUrl = 'http://127.0.0.1:8000/api/revenue/history';
 
-    try {
-      const [predictionRes, historyRes] = await Promise.all([
-        fetch(url),
-        fetch("/api/revenue/history")
-      ]);
+  if (type === 'month') predictionUrl = "/api/revenue/predictionMonth";
+  else if (type === 'quarter') predictionUrl = "/api/revenue/predictionQuarter";
+  else if (type === 'annual') predictionUrl = "/api/revenue/predictionAnnual";
 
-      if (!predictionRes.ok || !historyRes.ok) throw new Error('Failed to fetch data');
+  try {
+    const [predictionRes, historyRes] = await Promise.all([
+      fetch(predictionUrl),
+      fetch(historyUrl)
+    ]);
 
-      const prediction = await predictionRes.json();
-      const history = await historyRes.json();
+    if (!predictionRes.ok || !historyRes.ok) throw new Error('Failed to fetch data');
 
-      const historyLabels = history.map(h => `${h.year}-${String(h.month).padStart(2,'0')}`);
-      const historyValues = history.map(h => h.historical_revenue);
-      const predictionValue = Object.values(prediction)[0];
+    const predictionData = await predictionRes.json();
+    const history = await historyRes.json();
 
-      const predictedData = historyValues.map((val, idx) => idx === historyValues.length - 1 ? val : null);
-      predictedData.push(predictionValue);
+    // Historical data
+    const historyLabels = history.map(h => h.date);
+    const historyValues = history.map(h => parseFloat(h.historical_revenue));
 
-      if (chartInstance) chartInstance.destroy();
+    // Predicted revenue
+    const predictedRevenue = parseFloat(predictionData.prediction.replace(/,/g, ''));
+    const predictedDate = predictionData.date;
 
-      const ctx = document.getElementById('revenueChart').getContext('2d');
-      chartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: [...historyLabels, label],
-          datasets: [{
-              label: 'Historical Revenue',
-              data: [...historyValues, null],
-              borderColor: 'var(--pdogreen)',
-              backgroundColor: 'rgba(24,77,43,0.2)',
-              tension: 0.3,
-              pointRadius: 4
-            },
-            {
-              label: 'Predicted Revenue',
-              data: predictedData,
-              borderColor: 'var(--pdogold)',
-              backgroundColor: 'rgba(255,193,7,0.3)',
-              borderDash: [5, 5],
-              tension: 0.3,
-              pointRadius: 6
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: 'top'
-            },
-            tooltip: {
-              mode: 'index',
-              intersect: false
-            }
+    // Chart labels: historical + predicted
+    const allLabels = [...historyLabels, predictedDate];
+
+    // Historical data: only actual historical points
+    const historicalData = [...historyValues, null];
+
+    // Predicted data: null for historical points, then predicted revenue at last index
+    const predictedData = Array(historyValues.length).fill(null);
+    predictedData.push(predictedRevenue);
+
+    if (chartInstance) chartInstance.destroy();
+
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    chartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: allLabels,
+        datasets: [
+          {
+            label: 'Historical Revenue',
+            data: historicalData,
+            borderColor: 'var(--pdogold)',
+            backgroundColor: 'rgba(255,193,7,0.2)',
+            tension: 0.3,
+            pointRadius: 4
           },
-          scales: {
-            y: {
-              beginAtZero: true
-            }
+          {
+            label: 'Predicted Revenue',
+            data: predictedData,
+            borderColor: 'var(--pdogold)',
+            backgroundColor: 'rgba(255,193,7,0.3)',
+            pointRadius: 6,
+            showLine: false // only marker
           }
+        ]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top' },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          y: { beginAtZero: true }
         }
-      });
+      }
+    });
 
-    } catch (err) {
-      alert('Error loading chart: ' + err.message);
-      console.error(err);
-    }
+  } catch (err) {
+    alert('Error loading chart: ' + err.message);
+    console.error(err);
   }
+}
 
-  // Load monthly data by default
-  loadPrediction('month');
+// Load monthly data by default
+loadPrediction('month');
 </script>
 @endsection
+
+

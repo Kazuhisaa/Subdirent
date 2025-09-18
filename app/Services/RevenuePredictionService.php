@@ -1,59 +1,60 @@
 <?php
-
 namespace App\Services;
-
+use Phpml\Metric\Regression as RegressionMetric;
 use App\Models\RevenuePrediction;
 use Phpml\Regression\LeastSquares;
-use Phpml\Metric\Regression as RegressionMetric;
+use Carbon\Carbon;
 
 class RevenuePredictionService
 {
-    public function predictMonthly()
+    public function predictmonthly()
     {
-        $revenueDataset = RevenuePrediction::all()->toArray();
+        $dataset = RevenuePrediction::all()->toArray();
         $features = [];
         $targets = [];
-        $length = count($revenueDataset);
+        $length = count($dataset);
 
         for ($i = 1; $i < $length; $i++) {
-            $prev = $revenueDataset[$i - 1];
-            $curr = $revenueDataset[$i];
+            $prev = $dataset[$i - 1];
+            $curr = $dataset[$i];
 
-            $features[] = [$curr['year'], $curr['month'], $prev['historical_revenue']];
+            $features[] = [$prev['historical_revenue']];
             $targets[] = $curr['historical_revenue'];
         }
 
+    
         $regression = new LeastSquares();
         $regression->train($features, $targets);
 
-        $last = end($revenueDataset);
-        $futureYear = $last['year']; // or adjust based on your dataset
-        $futureMonth = $last['month'] + 1;
+        $last = end($dataset);
 
         $predicted = $regression->predict([
-            $futureYear, $futureMonth, $last['historical_revenue']
+            $last['historical_revenue']
         ]);
 
+        $lastdate = Carbon::parse($last['date']);
+        $nextdate = $lastdate->copy()->addmonth()->format('Y-m-d');
+
         return [
-            'prediction (monthly)' => number_format($predicted,2)   
-            'prediction for next month' => number_format($predicted, 2)
+            'prediction' => number_format($predicted, 2),
+            'date' => $nextdate
         ];
     }
 
     public function predictQuarterly()
     {
-        $revenueDataset = RevenuePrediction::all()->toArray();
+        $dataset = RevenuePrediction::all()->toArray();
         $features = [];
         $targets = [];
-        $length = count($revenueDataset);
+        $length = count($dataset);
 
         for ($i = 3; $i < $length; $i++) {
-            $curr = $revenueDataset[$i];
+            $curr = $dataset[$i];
             $features[] = [
-                $curr['year'], $curr['month'],
-                $revenueDataset[$i-1]['historical_revenue'],
-                $revenueDataset[$i-2]['historical_revenue'],
-                $revenueDataset[$i-3]['historical_revenue']
+                
+                $dataset[$i-1]['historical_revenue'],
+                $dataset[$i-2]['historical_revenue'],
+                $dataset[$i-3]['historical_revenue']
             ];
             $targets[] = $curr['historical_revenue'];
         }
@@ -61,81 +62,113 @@ class RevenuePredictionService
         $regression = new LeastSquares();
         $regression->train($features, $targets);
 
-        $last = array_slice($revenueDataset, -3);
-        $futureYear = end($revenueDataset)['year'];
-        $futureMonth = end($revenueDataset)['month'] + 3;
-
+        $last = array_slice($dataset, -3);
+    
         $predicted = $regression->predict([
-            $futureYear, $futureMonth,
             $last[2]['historical_revenue'],
             $last[1]['historical_revenue'],
             $last[0]['historical_revenue']
         ]);
 
+        $lastdate = Carbon::parse($last[2]['date']);
+        $nextdate = $lastdate->copy()->addmonths(3)->format('Y-m-d');
+
         return [
-            'prediction (quarterly)' => number_format($predicted,2)   
-            'prediction for next 3 months' => number_format($predicted, 2)
+            'prediction' => number_format($predicted, 2),
+            'date' => $nextdate
         ];
     }
 
     public function predictAnnual()
     {
-        $revenueDataset = RevenuePrediction::all()->toArray();
+        $dataset = RevenuePrediction::all()->toArray();
         $features = [];
         $targets = [];
-        $length = count($revenueDataset);
+        $length = count($dataset);
 
         for ($i = 12; $i < $length; $i++) {
-            $curr = $revenueDataset[$i];
-            $features[] = [
-                $curr['year'], $curr['month'],
-                $revenueDataset[$i-1]['historical_revenue'],
-                $revenueDataset[$i-2]['historical_revenue'],
-                $revenueDataset[$i-3]['historical_revenue'],
-                $revenueDataset[$i-4]['historical_revenue'],
-                $revenueDataset[$i-5]['historical_revenue'],
-                $revenueDataset[$i-6]['historical_revenue'],
-                $revenueDataset[$i-7]['historical_revenue'],
-                $revenueDataset[$i-8]['historical_revenue'],
-                $revenueDataset[$i-9]['historical_revenue'],
-                $revenueDataset[$i-10]['historical_revenue'],
-                $revenueDataset[$i-11]['historical_revenue'],
-                $revenueDataset[$i-12]['historical_revenue']
-            ];
+            $curr = $dataset[$i];
+            $feature = [];
+            for ($j = 1; $j <= 12; $j++) {
+                $feature[] = $dataset[$i - $j]['historical_revenue'];
+            }
+            $features[] = $feature;
             $targets[] = $curr['historical_revenue'];
         }
 
         $regression = new LeastSquares();
         $regression->train($features, $targets);
 
-        $last = array_slice($revenueDataset, -12);
-        $futureYear = end($revenueDataset)['year'];
-        $futureMonth = end($revenueDataset)['month'] + 12;
+        $last = array_slice($dataset, -12);
+ 
 
-        $predicted = $regression->predict([
-            $futureYear, $futureMonth,
-            $last[11]['historical_revenue'],
-            $last[10]['historical_revenue'],
-            $last[9]['historical_revenue'],
-            $last[8]['historical_revenue'],
-            $last[7]['historical_revenue'],
-            $last[6]['historical_revenue'],
-            $last[5]['historical_revenue'],
-            $last[4]['historical_revenue'],
-            $last[3]['historical_revenue'],
-            $last[2]['historical_revenue'],
-            $last[1]['historical_revenue'],
-            $last[0]['historical_revenue']
-        ]);
+        $futureFeature = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $futureFeature[] = $last[$i]['historical_revenue'];
+        }
 
-        $predictedAll = array_map(fn($x) => $regression->predict($x), $features);
-        $r2 = RegressionMetric::r2Score($targets, $predictedAll);
-          return [
-            'prediction (Annually)' => number_format($predicted,2)
+        $predicted = $regression->predict($futureFeature);
+
+        $lastdate = Carbon::parse($last[11]['date']);
+        $nextdate = $lastdate->copy()->addmonths(12)->format('Y-m-d');
 
         return [
-            'prediction for next 12 months' => number_format($predicted, 2),
-            'r2_score' => round($r2, 2)
+            'prediction' => number_format($predicted, 2),
+            'date' => $nextdate
         ];
     }
+
+
+   public function quarterlyForecastWithError()
+{
+    $dataset = RevenuePrediction::all()->toArray();
+    $features = [];
+    $targets = [];
+    $length = count($dataset);
+
+    // Build features: last 3 months
+    for ($i = 3; $i < $length; $i++) {
+        $features[] = [
+            
+            $dataset[$i-1]['historical_revenue'],
+            $dataset[$i-2]['historical_revenue'],
+            $dataset[$i-3]['historical_revenue']
+        ];
+        $targets[] = $dataset[$i]['historical_revenue'];
+    }
+
+    $regression = new LeastSquares();
+    $regression->train($features, $targets);
+
+    // Generate predictions for training data to calculate error
+    $predicted = [];
+    foreach ($features as $f) {
+        $predicted[] = $regression->predict($f);
+    }
+
+    // Calculate error metrics
+    $mae = RegressionMetric::meanAbsoluteError($targets, $predicted);
+    $mse = RegressionMetric::meanSquaredError($targets, $predicted);
+    $rmse = sqrt($mse); // Manual RMSE calculation
+
+    // Predict next quarter
+    $last = array_slice($dataset, -3);
+    $nextPrediction = $regression->predict([
+        $last[2]['historical_revenue'],
+        $last[1]['historical_revenue'],
+        $last[0]['historical_revenue']
+    ]);
+
+    $lastdate = Carbon::parse($last[2]['date']);
+    $nextdate = $lastdate->copy()->addMonths(3)->format('Y-m-d');
+
+    return [
+        'prediction' => number_format($nextPrediction, 2),
+        'date' => $nextdate,
+        'MAE' => number_format($mae, 2),
+        'MSE' => number_format($mse, 2),
+        'RMSE' => number_format($rmse, 2),
+    ];
+}
+
 }

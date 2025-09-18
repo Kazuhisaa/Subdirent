@@ -7,7 +7,7 @@ use Phpml\Metric\Regression as RegressionMetric;
 use Carbon\Carbon;
 class OccupancyPredictionService{
 
-   public function predictMonthly(){
+   public function predictmonthly(){
        $occupancyDataset = OccupancyPrediction::all()->toarray();
          $targets = [];
         $features = [];
@@ -17,31 +17,31 @@ class OccupancyPredictionService{
             $prev = $occupancyDataset[$i - 1];
             $curr = $occupancyDataset[$i];
 
-            $features[] = [$curr['Year'],$curr['Month'],$prev['Occupancy rate']];
-            $targets[] = $curr['Occupancy rate'];
+            $features[] = [$curr['year'],$curr['month'],$prev['occupancy_rate']];
+            $targets[] = $curr['occupancy_rate'];
         }
      
         $regression = new LeastSquares();
         $regression->train($features,$targets);
         $last = end($occupancyDataset);
-        $futureYear = $occupancyDataset[$length-1]['Year'] + 1;
-        $futureMonth = $occupancyDataset[$length-1]['Month'] + 1;
+        $futureyear = $occupancyDataset[$length-1]['year'] + 1;
+        $futuremonth = $occupancyDataset[$length-1]['month'] + 1;
 
         
         $predicted = $regression->predict([
-            $futureYear, $futureMonth,
-            $last['Occupancy rate']
+            $futureyear, $futuremonth,
+            $last['occupancy_rate']
         ]);
 
         
-         $predictedAll = array_map(fn($x) => $regression->predict($x), $features);
-        $r2 = RegressionMetric::r2Score($targets, $predictedAll);
+        //  $predictedAll = array_map(fn($x) => $regression->predict($x), $features);
+        // $r2 = RegressionMetric::r2Score($targets, $predictedAll);
 
-            $lastDate = Carbon::parse($last['Date']);
-            $nextDate = $lastDate->copy()->addMonth()->format('Y-m-d');
+            $lastdate = Carbon::parse($last['date']);
+            $nextdate = $lastdate->copy()->addmonth()->format('Y-m-d');
          return [
                   'prediction' => number_format($predicted,2) ,
-                 'Date' => $nextDate
+                 'date' => $nextdate
          ];
    }
   
@@ -56,36 +56,77 @@ class OccupancyPredictionService{
         for ($i = 3; $i < $length; $i++) {
             $curr = $occupancyDataset[$i];
             $features[] = [
-                $curr['Year'], $curr['Month'],
-                $occupancyDataset[$i-1]['Occupancy rate'],
-                $occupancyDataset[$i-2]['Occupancy rate'],
-                $occupancyDataset[$i-3]['Occupancy rate']
+                $curr['year'], $curr['month'],
+                $occupancyDataset[$i-1]['occupancy_rate'],
+                $occupancyDataset[$i-2]['occupancy_rate'],
+                $occupancyDataset[$i-3]['occupancy_rate']
             ];
-            $targets[] = $curr['Occupancy rate'];
+            $targets[] = $curr['occupancy_rate'];
         }
    $regression = new LeastSquares();
         $regression->train($features, $targets);
 
         $last = array_slice($occupancyDataset, -3);
-        $futureYear = $occupancyDataset[$length-1]['Year'] + 3;
-        $futureMonth = $occupancyDataset[$length-1]['Month'] + 3;
+        $futureyear = $occupancyDataset[$length-1]['year'] + 3;
+        $futuremonth = $occupancyDataset[$length-1]['month'] + 3;
 
         $predicted = $regression->predict([
-            $futureYear, $futureMonth,
-            $last[2]['Occupancy rate'],
-            $last[1]['Occupancy rate'],
-            $last[0]['Occupancy rate']
+            $futureyear, $futuremonth,
+            $last[2]['occupancy_rate'],
+            $last[1]['occupancy_rate'],
+            $last[0]['occupancy_rate']
         ]);
 
 
-         $predictedAll = array_map(fn($x) => $regression->predict($x), $features);
-        $r2 = RegressionMetric::r2Score($targets, $predictedAll);
+        //  $predictedAll = array_map(fn($x) => $regression->predict($x), $features);
+        // $r2 = RegressionMetric::r2Score($targets, $predictedAll);
 
-            $lastDate = Carbon::parse($last[2]['Date']);
-            $nextDate = $lastDate->copy()->addMonth(3)->format('Y-m-d');
+            $lastdate = Carbon::parse($last[2]['date']);
+            $nextdate = $lastdate->copy()->addmonth(3)->format('Y-m-d');
          return [
                   'prediction' => number_format($predicted,2) ,
-                 'Date' => $nextDate
+                 'date' => $nextdate
          ];
    }
+  
+   public function predictAnnually(){
+        $occupancyDataset = OccupancyPrediction::all()->toarray();
+         $targets = [];
+        $features = [];
+        $length = count($occupancyDataset);
+        
+        for ($i = 12; $i < $length; $i++) {
+            $curr = $occupancyDataset[$i];
+            $feature = [$curr['year'], $curr['month']];
+            for ($j = 1; $j <= 12; $j++) {
+                $feature[] = $occupancyDataset[$i - $j]['occupancy_rate'];
+            }
+            $features[] = $feature;
+            $targets[] = $curr['occupancy_rate'];
+        }
+
+             $regression = new LeastSquares();
+        $regression->train($features, $targets);
+        
+        $last = array_slice($occupancyDataset, -12);
+        $futureyear = end($occupancyDataset)['year'] + 12;
+        $futuremonth = end($occupancyDataset)['month'] + 12;
+
+          $futureFeature = [$futureyear, $futuremonth];
+        for ($i = 11; $i >= 0; $i--) {
+            $futureFeature[] = $last[$i]['occupancy_rate'];
+        }
+
+        $predicted= $regression->predict($futureFeature);
+
+
+            $lastdate = Carbon::parse($last[11]['date']);
+            $nextdate = $lastdate->copy()->addmonth(12)->format('Y-m-d');
+         return [
+                  'prediction' => number_format($predicted,2) ,
+                  'date' => $nextdate
+         ];
+   }     
+
+
 }
