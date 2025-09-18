@@ -2,11 +2,13 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\BookingController;
-use App\Http\Controllers\UnitsController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\UnitsController;
 use App\Http\Controllers\TenantController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\RevenuePredictionController;
+use App\Http\Controllers\OccupancyPredictionController;
+
 use App\Models\RevenuePrediction;
 use App\Services\RevenuePredictionService;
 use App\Http\Controllers\PaymentController;
@@ -17,6 +19,7 @@ use App\Http\Controllers\AutopayController;
 Route::prefix('booking')->group(function () {
     Route::get('/book-slot', [BookingController::class, 'getByDate']);
     Route::post('/schedule', [BookingController::class, 'store']);
+    Route::get('/allBookings',[BookingController::class,'showAllBooking']);
     Route::get('/Testing', [BookingController::class, 'testApi']);
 });
 

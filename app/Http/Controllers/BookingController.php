@@ -145,5 +145,20 @@ class BookingController extends Controller
         ], 201);
     }
 
+/**
+     * @OA\Get(
+     *     path="/api/booking",
+     *     summary="Get all bookings",
+     *     tags={"Booking"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful response with list of bookings"
+     *     )
+     * )
+     */
+    public function showAllBooking(){
+        $bookings = Booking::all();
+        return response()->json($bookings);
+    }
   
   }
