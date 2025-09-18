@@ -9,6 +9,7 @@ use App\Models\Payment;
 
 class TenantController extends Controller
 {
+  
   // Add new tenant
 
   public function store(Request $request)
@@ -53,6 +54,15 @@ class TenantController extends Controller
       'message' => 'Tenant added successfully with initial payment!',
       'tenant'  => $tenant->load('unit', 'payments')
     ], 201);
+  }
+  public function manageTenants()
+  {
+    $tenants = Tenant::with('unit')->get();
+
+    // Get prefill from session (may be null)
+    $prefillTenant = session('prefillTenant') ?? null;
+
+    return view('admin.tenants', compact('tenants', 'prefillTenant'));
   }
 
 

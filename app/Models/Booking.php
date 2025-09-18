@@ -10,21 +10,10 @@ class Booking extends Model
     //
 
     protected $fillable = [
-
-        'property_id',
-        'booking_date',
-        'booking_time',
-        'full_name',
-        'email',
-        'phone_number',
-        'visit_type',
-        'notes'
-
+        'unit_id','title','price','full_name','email','contact','date','time_slot','notes','status'
     ];
 
-
-    public function property()
-    {
+    public function unit() {
         return $this->belongsTo(Unit::class);
     }
 }

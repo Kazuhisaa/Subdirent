@@ -1,5 +1,6 @@
 <div class="container my-3">
-    <form id="applyForm" enctype="multipart/form-data">
+    <form id="applyForm" enctype="multipart/form-data" method="POST" action="{{ route('applications.store') }}">
+        @csrf
         <div class="card shadow-sm p-4">
             <div class="card-header bg-success text-white mb-4">
                 <h3 class="fw-bold mb-0">Apply to Rent</h3>
@@ -49,6 +50,16 @@
                 <input type="text" id="salary" name="salary" class="form-control" required>
             </div>
 
+            <div class="mb-3">
+                <label for="leaseStart" class="form-label">Preferred Lease Start</label>
+                <input type="date" id="leaseStart" name="lease_start" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="leaseDuration" class="form-label">Lease Duration (months)</label>
+                <input type="number" id="leaseDuration" name="lease_duration" class="form-control" min="1" required>
+            </div>
+
             <button type="submit" class="btn btn-success w-100 mt-3">Submit Application</button>
             <button type="button" class="btn btn-outline-secondary w-100 mt-2" data-bs-dismiss="modal">⬅ Back</button>
         </div>
@@ -58,3 +69,29 @@
         ✅ Thank you! Your application has been submitted. We’ll contact you soon.
     </div>
 </div>
+
+<!-- Add this script at the end of your form partial -->
+<script>
+document.getElementById('applyForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            document.getElementById('successMsg').classList.remove('d-none');
+            form.classList.add('d-none');
+        } else {
+            alert('❌ Submission failed. Please check your input.');
+        }
+    })
+    .catch(() => alert('❌ Submission failed. Please try again.'));
+});
+</script>
