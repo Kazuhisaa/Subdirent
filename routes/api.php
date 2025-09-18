@@ -49,6 +49,13 @@ Route::prefix('revenue')->group(function () {
     Route::get('/predictionAnnual', [RevenuePredictionController::class, 'showRevenuePredictionAnnualy']);
 });
 
+ 
+Route::prefix('occupancy')->group(function(){
+     Route::get('/predictionMonth',[OccupancyPredictionController::class,'showOccupancyByMonth']);
+     Route::get('/predictionQuarter',[OccupancyPredictionController::class,'showOccupancyByQuarter']);
+      Route::get('/predictionAnnual',[OccupancyPredictionController::class,'showOccupancyByAnnual']);
+});
+ 
 Route::get('/revenue/history', function () {
     return RevenuePrediction::select('year', 'month', 'historical_revenue')
         ->orderBy('year')

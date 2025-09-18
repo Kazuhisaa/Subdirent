@@ -28,6 +28,10 @@ class OccupancyPredictionController extends Controller
          return response()->json($this->service->predictQuarterly());
     }
 
+    public function showOccupancyByAnnual(){
+        return response()->json($this->service->predictAnnually());
+    }
+
 
     
     
