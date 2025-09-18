@@ -35,44 +35,44 @@
                     </thead>
                     <tbody>
                         @forelse($tenants as $tenant)
-                            @php
-                                $payment = $tenant->payments->first();
-                            @endphp
-                            <tr>
-                                <td class="fw-semibold">{{ $tenant->first_name }} {{ $tenant->last_name }}</td>
-                                <td>{{ $tenant->email ?? '—' }}</td>
-                                <td>{{ $tenant->contact ?? '—' }}</td>
-                                <td>{{ $tenant->unit_id ?? '—' }}</td>
-                                <td>₱{{ number_format($tenant->monthly_rent, 2) }}</td>
-                                <td>
-                                    @if($payment)
-                                        <span class="badge bg-success">
-                                            <i class="bi bi-check-circle me-1"></i> Paid
-                                        </span>
-                                    @else
-                                        <span class="badge bg-danger">
-                                            <i class="bi bi-x-circle me-1"></i> Unpaid
-                                        </span>
-                                    @endif
-                                </td>
-                                <td>{{ \Carbon\Carbon::createFromFormat('Y-m', $month)->endOfMonth()->format('F d, Y') }}</td>
-                                <td class="text-center">
-                                    @if(!$payment)
-                                        <a href="#" class="btn btn-warning btn-sm">
-                                            <i class="bi bi-envelope"></i> Send Reminder
-                                        </a>
-                                    @else
-                                        <span class="text-muted">—</span>
-                                    @endif
-                                </td>
-                            </tr>
+                        @php
+                        $payment = $tenant->payments->first();
+                        @endphp
+                        <tr>
+                            <td class="fw-semibold">{{ $tenant->first_name }} {{ $tenant->last_name }}</td>
+                            <td>{{ $tenant->email ?? '—' }}</td>
+                            <td>{{ $tenant->contact ?? '—' }}</td>
+                            <td>{{ $tenant->unit->title ?? '—' }}</td>
+                            <td>₱{{ number_format($tenant->monthly_rent, 2) }}</td>
+                            <td>
+                                @if($payment)
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle me-1"></i> Paid
+                                </span>
+                                @else
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-x-circle me-1"></i> Unpaid
+                                </span>
+                                @endif
+                            </td>
+                            <td>{{ \Carbon\Carbon::createFromFormat('Y-m', $month)->endOfMonth()->format('F d, Y') }}</td>
+                            <td class="text-center">
+                                @if(!$payment)
+                                <a href="#" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-envelope"></i> Send Reminder
+                                </a>
+                                @else
+                                <span class="text-muted">—</span>
+                                @endif
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="8" class="text-center text-muted py-4">
-                                    <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                                    No tenants found for this month.
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                No tenants found for this month.
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>

@@ -84,7 +84,7 @@
         <div class="row g-4">
           <!-- Left: Payment History -->
           <div class="col-md-8 h-150">
-            <div class="card p-3 shadow-sm ">
+            <div class="card p-3 shadow-sm">
               <h5 class="mb-3">Payment History</h5>
               <table class="table table-striped mb-0">
                 <thead class="table-light">
@@ -111,8 +111,10 @@
             </div>
           </div>
 
-          <!-- Right: Pay Now Card -->
-          <div class="col-md-4">
+          <!-- Right: Pay Now + AutoPay -->
+          <div class="col-md-4 d-flex flex-column gap-3">
+
+            <!-- Pay Now Card -->
             <div class="card p-4 shadow-sm text-center">
               <h5 class="mb-3">Next Payment</h5>
               <p class="mb-2">{{ $nextMonth['date'] ?? 'Next Payment Date' }}</p>
@@ -137,107 +139,143 @@
                 </button>
               </form>
               @endif
-
             </div>
+
+            <!-- AutoPay Card -->
+            <div class="card p-4 shadow-sm text-center">
+              <h5 class="mb-3">Auto Payment</h5>
+              <p class="mb-2">Set up recurring payments</p>
+
+              <form method="POST" action="{{ route('autopay.setup', $tenant->id) }}">
+                @csrf
+                <div class="mb-3">
+                  <label for="autopay_method" class="form-label">Payment Method</label>
+                  <select name="method" id="autopay_method" class="form-select" required>
+                    <option value="" disabled selected>-- Choose --</option>
+                    <option value="gcash">GCash</option>
+                    <option value="card">Credit/Debit Card</option>
+                    <option value="bank">Bank Account</option>
+                  </select>
+                </div>
+
+                <div class="mb-3">
+                  <label for="autopay_day" class="form-label">Payment Day</label>
+                  <select name="day_of_month" id="autopay_day" class="form-select" required>
+                    @for($i = 1; $i <= 28; $i++)
+                      <option value="{{ $i }}">{{ $i }}</option>
+                      @endfor
+                  </select>
+                </div>
+
+                <button type="submit" class="btn btn-warning w-100">
+                  Enable AutoPay
+                </button>
+              </form>
+            </div>
+
           </div>
         </div>
 
       </div>
 
 
-      <!-- Lease Agreement Tab -->
-      <div class="tab-pane fade" id="lease" role="tabpanel">
-        <div class="card p-3 bg-white shadow-sm">
-          <h4 class="text-dark fw-bold">Lease Agreement</h4>
-          <p class="text-dark"><strong>Start Date:</strong> {{ $tenant->lease_start ?? 'N/A' }}</p>
-          <p class="text-dark"><strong>End Date:</strong> {{ $tenant->lease_end ?? 'N/A' }}</p>
-          <p class="text-dark"><strong>Monthly Rent:</strong> {{ $tenant->monthly_rent ?? 'N/A' }}</p>
-        </div>
-      </div>
 
-      <!-- Maintenance Tab -->
-      <div class="tab-pane fade" id="maintenance" role="tabpanel">
-        <div class="card p-3 bg-white shadow-sm">
-          <h4 class="text-dark fw-bold">Maintenance Requests</h4>
-          <p class="text-dark">No maintenance records yet. (Placeholder)</p>
-        </div>
+    </div>
+
+
+    <!-- Lease Agreement Tab -->
+    <div class="tab-pane fade" id="lease" role="tabpanel">
+      <div class="card p-3 bg-white shadow-sm">
+        <h4 class="text-dark fw-bold">Lease Agreement</h4>
+        <p class="text-dark"><strong>Start Date:</strong> {{ $tenant->lease_start ?? 'N/A' }}</p>
+        <p class="text-dark"><strong>End Date:</strong> {{ $tenant->lease_end ?? 'N/A' }}</p>
+        <p class="text-dark"><strong>Monthly Rent:</strong> {{ $tenant->monthly_rent ?? 'N/A' }}</p>
+      </div>
+    </div>
+
+    <!-- Maintenance Tab -->
+    <div class="tab-pane fade" id="maintenance" role="tabpanel">
+      <div class="card p-3 bg-white shadow-sm">
+        <h4 class="text-dark fw-bold">Maintenance Requests</h4>
+        <p class="text-dark">No maintenance records yet. (Placeholder)</p>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Custom Styles -->
-  <style>
-    .nav-tabs .nav-link.active {
-      background-color: #0d3b2e !important;
-      color: #fff !important;
-      font-weight: bold;
-    }
+<!-- Custom Styles -->
+<style>
+  .nav-tabs .nav-link.active {
+    background-color: #0d3b2e !important;
+    color: #fff !important;
+    font-weight: bold;
+  }
 
-    .nav-tabs .nav-link {
-      color: #000 !important;
-    }
+  .nav-tabs .nav-link {
+    color: #000 !important;
+  }
 
-    .card {
-      background-color: #fff !important;
-      color: #000 !important;
-    }
+  .card {
+    background-color: #fff !important;
+    color: #000 !important;
+  }
 
-    .card p,
-    .card h4,
-    .card strong {
-      color: #000 !important;
-    }
-  </style>
-  @endsection
+  .card p,
+  .card h4,
+  .card strong {
+    color: #000 !important;
+  }
+</style>
+@endsection
 
-  @section('scripts')
-  <script>
-    const autopayCheckbox = document.getElementById('autopayCheckbox');
-    const autopayOptions = document.getElementById('autopayOptions');
-    const paymentMethodSelect = document.getElementById('paymentMethodSelect');
-    const paymentDetails = document.getElementById('paymentDetails');
-    const gcashFields = document.getElementById('gcashFields');
-    const cardFields = document.getElementById('cardFields');
+@section('scripts')
+<script>
+  const autopayCheckbox = document.getElementById('autopayCheckbox');
+  const autopayOptions = document.getElementById('autopayOptions');
+  const paymentMethodSelect = document.getElementById('paymentMethodSelect');
+  const paymentDetails = document.getElementById('paymentDetails');
+  const gcashFields = document.getElementById('gcashFields');
+  const cardFields = document.getElementById('cardFields');
 
-    function togglePaymentDetails() {
-      const method = paymentMethodSelect.value;
-      paymentDetails.style.display = method ? 'block' : 'none';
-      gcashFields.style.display = method === 'gcash' ? 'block' : 'none';
-      cardFields.style.display = method === 'card' ? 'block' : 'none';
-    }
+  function togglePaymentDetails() {
+    const method = paymentMethodSelect.value;
+    paymentDetails.style.display = method ? 'block' : 'none';
+    gcashFields.style.display = method === 'gcash' ? 'block' : 'none';
+    cardFields.style.display = method === 'card' ? 'block' : 'none';
+  }
 
-    // Checkbox toggle
-    autopayCheckbox.addEventListener('change', function() {
-      autopayOptions.style.display = this.checked ? 'block' : 'none';
-      if (!this.checked) {
-        paymentDetails.style.display = 'none';
-        paymentMethodSelect.value = '';
-      } else {
-        togglePaymentDetails();
-      }
-    });
-
-    // Payment method select
-    paymentMethodSelect.addEventListener('change', togglePaymentDetails);
-
-    // Initialize display on page load
-    if (autopayCheckbox.checked) {
+  // Checkbox toggle
+  autopayCheckbox.addEventListener('change', function() {
+    autopayOptions.style.display = this.checked ? 'block' : 'none';
+    if (!this.checked) {
+      paymentDetails.style.display = 'none';
+      paymentMethodSelect.value = '';
+    } else {
       togglePaymentDetails();
     }
+  });
 
-    // Form submit
-    document.getElementById('autopayForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      let formData = new FormData(this);
-      fetch(`/api/tenants/{{ $tenant->id }}/autopay`, {
-          method: 'POST',
-          body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-          alert('✅ Autopay settings saved!');
-        })
-        .catch(err => alert('❌ Error saving autopay settings'));
-    });
-  </script>
-  @endsection
+  // Payment method select
+  paymentMethodSelect.addEventListener('change', togglePaymentDetails);
+
+  // Initialize display on page load
+  if (autopayCheckbox.checked) {
+    togglePaymentDetails();
+  }
+
+  // Form submit
+  document.getElementById('autopayForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    let formData = new FormData(this);
+    fetch(`/api/tenants/{{ $tenant->id }}/autopay`, {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert('✅ Autopay settings saved!');
+      })
+      .catch(err => alert('❌ Error saving autopay settings'));
+  });
+</script>
+@endsection

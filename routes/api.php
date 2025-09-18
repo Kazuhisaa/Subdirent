@@ -73,8 +73,6 @@ Route::get('/test', [TestController::class, 'test']);
 Route::post('/paymongo/webhook', [PaymentController::class, 'webhook'])
     ->name('payment.webhook');
 
-Route::prefix('tenants')->group(function () {
-    Route::post('{tenant}/autopay', [AutopayController::class, 'storeOrUpdate']);
-    Route::get('{tenant}/autopay', [AutopayController::class, 'show']);
-    Route::delete('{tenant}/autopay', [AutopayController::class, 'destroy']);
-});
+
+Route::post('/autopay/{tenant}/setup', [AutopayController::class, 'store'])->name('autopay.setup');
+Route::delete('/autopay/{tenant}/disable', [AutopayController::class, 'destroy'])->name('autopay.disable');
