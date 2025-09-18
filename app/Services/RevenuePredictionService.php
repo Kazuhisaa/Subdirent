@@ -1,11 +1,8 @@
 <?php
-
 namespace App\Services;
 
 use App\Models\RevenuePrediction;
 use Phpml\Regression\LeastSquares;
-use Phpml\Metric\Regression as RegressionMetric;
-use Phpml\Preprocessing\Normalizer;
 use Carbon\Carbon;
 
 class RevenuePredictionService
@@ -25,10 +22,6 @@ class RevenuePredictionService
             $targets[] = $curr['Historical Revenue'];
         }
 
-        // Normalize features
-        $normalizer = new Normalizer(Normalizer::NORM_L2);
-        $normalizer->transform($features);
-
         $regression = new LeastSquares();
         $regression->train($features, $targets);
 
@@ -36,12 +29,10 @@ class RevenuePredictionService
         $futureYear = $last['Year'] + 1;
         $futureMonth = $last['Month'] + 1;
 
-        $futureFeature = [$futureYear, $futureMonth, $last['Historical Revenue']];
-        $futureFeatureArray = [$futureFeature]; // wrap for transform
-        $normalizer->transform($futureFeatureArray);
-        $futureFeature = $futureFeatureArray[0];
-
-        $predicted = $regression->predict($futureFeature);
+        $predicted = $regression->predict([
+            $futureYear, $futureMonth,
+            $last['Historical Revenue']
+        ]);
 
         $lastDate = Carbon::parse($last['Date']);
         $nextDate = $lastDate->copy()->addMonth()->format('Y-m-d');
@@ -70,9 +61,6 @@ class RevenuePredictionService
             $targets[] = $curr['Historical Revenue'];
         }
 
-        $normalizer = new Normalizer(Normalizer::NORM_L2);
-        $normalizer->transform($features);
-
         $regression = new LeastSquares();
         $regression->train($features, $targets);
 
@@ -80,18 +68,12 @@ class RevenuePredictionService
         $futureYear = end($dataset)['Year'] + 3;
         $futureMonth = end($dataset)['Month'] + 3;
 
-        $futureFeature = [
+        $predicted = $regression->predict([
             $futureYear, $futureMonth,
             $last[2]['Historical Revenue'],
             $last[1]['Historical Revenue'],
             $last[0]['Historical Revenue']
-        ];
-
-        $futureFeatureArray = [$futureFeature];
-        $normalizer->transform($futureFeatureArray);
-        $futureFeature = $futureFeatureArray[0];
-
-        $predicted = $regression->predict($futureFeature);
+        ]);
 
         $lastDate = Carbon::parse($last[2]['Date']);
         $nextDate = $lastDate->copy()->addMonths(3)->format('Y-m-d');
@@ -119,9 +101,6 @@ class RevenuePredictionService
             $targets[] = $curr['Historical Revenue'];
         }
 
-        $normalizer = new Normalizer(Normalizer::NORM_L2);
-        $normalizer->transform($features);
-
         $regression = new LeastSquares();
         $regression->train($features, $targets);
 
@@ -134,14 +113,10 @@ class RevenuePredictionService
             $futureFeature[] = $last[$i]['Historical Revenue'];
         }
 
-        $futureFeatureArray = [$futureFeature];
-        $normalizer->transform($futureFeatureArray);
-        $futureFeature = $futureFeatureArray[0];
-
         $predicted = $regression->predict($futureFeature);
 
         $lastDate = Carbon::parse($last[11]['Date']);
-        $nextDate = $lastDate->copy()->addYear()->format('Y-m-d');
+        $nextDate = $lastDate->copy()->addMonths(12)->format('Y-m-d');
 
         return [
             'prediction' => number_format($predicted, 2),
