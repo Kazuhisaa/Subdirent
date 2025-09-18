@@ -12,11 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         //
-
+       
        Schema::table('revenue_predictions',function(Blueprint $table){
-        $table->date('Date')->nullable()->before('Year');
+            
+           $table->renameColumn('Year', 'year');
+           $table->renameColumn('Month', 'month');
+           $table->renameColumn('Date', 'date');
+           $table->renameColumn('Historical Revenue', 'historical_revenue');
         });
-        
+   
     }
 
     /**

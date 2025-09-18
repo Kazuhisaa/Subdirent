@@ -12,11 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         //
-
-       Schema::table('revenue_predictions',function(Blueprint $table){
-        $table->date('Date')->nullable()->before('Year');
+        Schema::table('occupancy_prediction', function (Blueprint $table) {
+              $table->renameColumn('Year', 'year');
+           $table->renameColumn('Month', 'month');
+           $table->renameColumn('Date', 'date');
+           $table->renameColumn('Occupancy rate', 'occupancy_rate');
         });
-        
     }
 
     /**

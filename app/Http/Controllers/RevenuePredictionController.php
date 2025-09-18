@@ -5,7 +5,7 @@ use App\Services\RevenuePredictionService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\RevenuePrediction;
-
+use Carbon\Carbon;
 
 class RevenuePredictionController extends Controller
 {
@@ -65,4 +65,17 @@ class RevenuePredictionController extends Controller
     public function showRevenuePredictionAnnualy(){
         return response()->json($this->service->predictAnnual());
     }
+
+        public function showRevenueHistory()
+        {
+          
+            $twelveMonthsAgo = Carbon::now()->subMonths(12);
+
+            $data = RevenuePrediction::select('historical_revenue', 'date')
+                ->where('date', '>=', $twelveMonthsAgo) 
+                ->orderBy('date', 'asc')                // Ayusin pataas ang petsa
+                ->get();
+
+            return response()->json($data);
+        }
 }
