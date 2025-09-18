@@ -1,6 +1,9 @@
 @extends('admin.admin')
 
 @section('content')
+@php
+    $prefill = session('prefillTenant');
+@endphp
 <div class="container py-4">
   <h2 class="mb-4">🧑‍💼 Admin - Manage Tenants</h2>
 
@@ -229,6 +232,9 @@
         locations.forEach(loc => {
           editLocationSelect.innerHTML += `<option value="${loc}">${loc}</option>`;
         });
+
+        // Prefill unit and location if redirected from application
+        prefillUnitAndLocation();
       });
   }
 
@@ -292,6 +298,9 @@
 
     fetch('/api/tenants/newTenant', {
         method: 'POST',
+        headers: {
+        'Accept': 'application/json'
+        },
         body: formData
       })
       .then(res => res.json())
@@ -384,6 +393,9 @@ ${t.image ? `<img src="/uploads/tenants/${t.image}" class="img-fluid rounded">` 
 
     fetch(`/api/tenants/updateTenant/${id}`, {
         method: 'POST',
+        headers: {
+        'Accept': 'application/json'
+        },
         body: formData
       })
       .then(res => res.json())
@@ -400,6 +412,9 @@ ${t.image ? `<img src="/uploads/tenants/${t.image}" class="img-fluid rounded">` 
     if (confirm('Are you sure you want to delete this tenant?')) {
       fetch(`/api/tenants/deleteTenant/${id}`, {
           method: 'DELETE'
+          headers: {
+          'Accept': 'application/json'
+          },
         })
         .then(res => res.json())
         .then(data => {
@@ -412,5 +427,76 @@ ${t.image ? `<img src="/uploads/tenants/${t.image}" class="img-fluid rounded">` 
   // Initial load
   loadUnits();
   loadTenants();
+</script>
+
+{{-- Prefill when redirected from ApplicationController::accept --}}
+@if(session('prefillTenant'))
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const app = @json(session('prefillTenant'));
+    window.__pendingTenantPrefill = app;
+
+    // Prefill text fields
+    document.querySelector('#addTenantForm input[name="first_name"]').value = app.first_name ?? '';
+    document.querySelector('#addTenantForm input[name="middle_name"]').value = app.middle_name ?? '';
+    document.querySelector('#addTenantForm input[name="last_name"]').value = app.surname ?? '';
+    document.querySelector('#addTenantForm input[name="email"]').value = app.email ?? '';
+    document.querySelector('#addTenantForm input[name="contact"]').value = app.contact_number ?? '';
+    document.querySelector('#addTenantForm input[name="monthly_rent"]').value = app.price ?? '';
+    document.querySelector('#addTenantForm input[name="lease_start"]').value = app.lease_start ?? '';
+
+    // Lease end auto-calc
+    if(app.lease_start && app.lease_duration) {
+        let s = new Date(app.lease_start);
+        s.setMonth(s.getMonth() + parseInt(app.lease_duration));
+        document.querySelector('#addTenantForm input[name="lease_end"]').value = s.toISOString().split('T')[0];
+    }
+
+    // Show preview of uploaded ID from application
+    if (app.id_file) {
+        let previewDiv = document.createElement('div');
+        previewDiv.classList.add('mt-2');
+        previewDiv.innerHTML = `
+          <p><strong>Uploaded ID from Application:</strong></p>
+          <img src="/uploads/applications/${app.id_file}" alt="Uploaded ID" class="img-fluid rounded" style="max-width:200px;">
+        `;
+        document.querySelector('#addTenantForm input[name="image"]').insertAdjacentElement('afterend', previewDiv);
+
+        // Hidden input → so it's included when saving tenant
+        let hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'prefilled_image';
+        hidden.value = app.id_file;
+        document.getElementById('addTenantForm').appendChild(hidden);
+    }
+
+    // Open modal
+    new bootstrap.Modal(document.getElementById('addTenantModal')).show();
+});
+
+// Prefill location + unit AFTER units are loaded
+function prefillUnitAndLocation() {
+    const app = window.__pendingTenantPrefill;
+    if (!app) return;
+    if (!window.allUnits || !app.unit_id) return;
+
+    const unitObj = window.allUnits.find(u => u.id == app.unit_id);
+    if (unitObj) {
+        // Set location
+        document.getElementById('locationSelect').value = unitObj.location;
+        document.getElementById('locationSelect').dispatchEvent(new Event('change'));
+
+        // Wait for units to load into dropdown
+        setTimeout(() => {
+            document.getElementById('unitSelect').value = app.unit_id;
+            document.getElementById('unitSelect').dispatchEvent(new Event('change'));
+        }, 200);
+    }
+}
+</script>
+@endif
+
+
+
 </script>
 @endsection

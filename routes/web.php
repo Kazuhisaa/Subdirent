@@ -5,7 +5,6 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\UnitsController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\maintenanceRequestAdminController;
 
 
 
@@ -16,9 +15,6 @@ Route::get('/', function () {
 Route::get('/apply', function () {
     return view('apply');
 })->name('apply');
-
-Route::post('/apply', [ApplicationController::class, 'submit'])->name('apply.submit');
-
 
 Route::get('/admin/admin', function () {
     return view('admin.admin');
@@ -31,6 +27,9 @@ Route::get('/admin/addUnit', function () {
 Route::get('/admin/addTenant', function () {
     return view('admin.addTenant');
 })->name('admin.tenants');
+
+Route::get('/admin/tenants', [TenantController::class, 'manageTenants'])->name('tenants.index');
+Route::post('/admin/tenants', [TenantController::class, 'store'])->name('tenants.store');
 
 Route::get('/admin/analytics', function () {
     return view('admin.analytics');

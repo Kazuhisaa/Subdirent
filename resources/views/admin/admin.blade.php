@@ -3,6 +3,7 @@
 <html lang="en">
 
 <head>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SubdiRent Admin</title>
@@ -108,7 +109,7 @@
       <a href="{{ route('admin.units') }}" class="btn fw-semibold">
         <i class="bi bi-building"></i> <span>Units</span>
       </a>
-      <a href="#" class="btn fw-semibold">
+      <a href="{{ route('admin.bookings') }}" class="btn fw-semibold">
         <i class="bi bi-journal-check"></i> <span>Bookings</span>
       </a>
       <a href="{{ route('admin.payments') }}" class="btn fw-semibold">

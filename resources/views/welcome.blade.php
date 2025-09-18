@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rental Management System</title>
     @vite([
-    'resources/bootstrap/css/bootstrap.min.css',
-    'resources/css/app.css',
-    'resources/js/app.js',
-    'resources/bootstrapjs/js/bootstrap.bundle.min.js'
+        'resources/bootstrap/css/bootstrap.min.css',
+        'resources/css/app.css',
+        'resources/js/app.js',
+        'resources/bootstrapjs/js/bootstrap.bundle.min.js'
     ])
 </head>
 
@@ -97,7 +97,6 @@
                 @forelse($units as $unit)
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="card h-100 unit-card border-0 shadow">
-                        <!-- Image -->
                         <div class="position-relative">
                             <img src="{{ $unit->image ? asset('uploads/units/'.$unit->image) : asset('images/no-image.png') }}"
                                 class="card-img-top unit-img"
@@ -113,32 +112,28 @@
                             <span class="badge bg-success position-absolute top-0 end-0 m-3 shadow">For Rent</span>
                         </div>
 
-                        <!-- Content -->
                         <div class="card-body d-flex flex-column bg-white">
                             <h5 class="fw-bold text-success">{{ $unit->title }}</h5>
                             <p class="text-muted mb-2"><i class="bi bi-geo-alt-fill text-warning"></i> {{ $unit->location }}</p>
                             <h6 class="fw-bold mb-3 text-gold">₱{{ number_format($unit->price, 2) }}/month</h6>
                             <p class="text-dark text-truncate-3">{{ $unit->description }}</p>
-
                             <div class="mt-auto d-flex gap-2">
                                 <button class="btn btn-outline-success flex-fill"
                                     onclick="showBookingForm(this)"
                                     data-unit="{{ $unit->id }}"
                                     data-title="{{ $unit->title }}"
-                                    data-price="₱{{ number_format($unit->price, 2) }}/month"
+                                    data-price="{{ $unit->price }}"
                                     data-img="{{ $unit->image ? asset('uploads/units/'.$unit->image) : asset('images/no-image.png') }}"
-                                    data-description="{{ $unit->description }}"
-                                    data-bs-toggle="modal" data-bs-target="#unitModal">
+                                    data-description="{{ $unit->description }}">
                                     <i class="bi bi-calendar-check"></i> Book Now
                                 </button>
                                 <button class="btn btn-gold flex-fill"
                                     onclick="showApplyForm(this)"
                                     data-unit="{{ $unit->id }}"
                                     data-title="{{ $unit->title }}"
-                                    data-price="₱{{ number_format($unit->price, 2) }}/month"
+                                    data-price="{{ $unit->price }}"
                                     data-img="{{ $unit->image ? asset('uploads/units/'.$unit->image) : asset('images/no-image.png') }}"
-                                    data-description="{{ $unit->description }}"
-                                    data-bs-toggle="modal" data-bs-target="#unitModal">
+                                    data-description="{{ $unit->description }}">
                                     <i class="bi bi-pencil-square"></i> Apply
                                 </button>
                             </div>
@@ -152,7 +147,70 @@
         </div>
     </section>
 
-    <!-- Custom CSS -->
+    <!-- Hidden Partials -->
+    <div id="bookingFormPartial" class="d-none">@include('partials._bookingForm')</div>
+    <div id="applyFormPartial" class="d-none">@include('partials._applyForm')</div>
+
+    <!-- Unit Modal -->
+    <div class="modal fade" id="unitModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-fullscreen-sm-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Unit Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-3" id="unitModalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+    function showUnitDetails(el){
+        const modalBody = document.getElementById('unitModalBody');
+        modalBody.innerHTML = `
+            <div class="row g-3">
+                <div class="col-12 col-md-5">
+                    <img src="${el.dataset.img}" class="img-fluid rounded" alt="Unit ${el.dataset.unit}">
+                </div>
+                <div class="col-12 col-md-7">
+                    <h3>Unit ${el.dataset.unit}: ${el.dataset.title}</h3>
+                    <h5 class="text-success">${el.dataset.price}</h5>
+                    <p>${el.dataset.description}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    function showBookingForm(btn){
+        const modalBody = document.getElementById('unitModalBody');
+        modalBody.innerHTML = document.getElementById('bookingFormPartial').innerHTML;
+
+        modalBody.querySelector('#unitTitle').textContent = btn.dataset.title;
+        modalBody.querySelector('#unitName').textContent = btn.dataset.unit;
+        modalBody.querySelector('#unitPrice').textContent = btn.dataset.price;
+        modalBody.querySelector('#unitDescription').textContent = btn.dataset.description;
+        modalBody.querySelector('#unitImg')?.setAttribute('src', btn.dataset.img);
+
+        new bootstrap.Modal(document.getElementById('unitModal')).show();
+    }
+
+    function showApplyForm(btn){
+        const modalBody = document.getElementById('unitModalBody');
+        modalBody.innerHTML = document.getElementById('applyFormPartial').innerHTML;
+
+        modalBody.querySelector('#selectedTitle')?.setAttribute('value', btn.dataset.title);
+        modalBody.querySelector('#selectedUnit')?.setAttribute('value', btn.dataset.unit);
+        modalBody.querySelector('#selectedPrice')?.setAttribute('value', btn.dataset.price);
+
+        new bootstrap.Modal(document.getElementById('unitModal')).show();
+    }
+    </script>
+
+    <!-- Custom Styles -->
     <style>
         .unit-card {
             border-radius: 15px;
@@ -180,7 +238,6 @@
 
         .text-gold {
             color: #b8860b;
-            /* dark goldenrod */
         }
 
         .btn-gold {
@@ -191,11 +248,9 @@
 
         .btn-gold:hover {
             background-color: #daa520;
-            /* goldenrod */
             color: #fff;
         }
     </style>
-
 
     <!-- Footer -->
     <footer id="footer">
@@ -276,9 +331,6 @@
             color: #fff !important;
         }
     </style>
-
-
-    @vite('resources/bootstrapjs/js/bootstrap.bundle.min.js')
 </body>
 
 </html>

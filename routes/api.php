@@ -8,7 +8,6 @@ use App\Http\Controllers\TenantController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\RevenuePredictionController;
 use App\Http\Controllers\OccupancyPredictionController;
-use App\Http\Controllers\maintenanceRequestController;
 
 use App\Models\RevenuePrediction;
 use App\Services\RevenuePredictionService;
