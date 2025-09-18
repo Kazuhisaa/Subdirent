@@ -53,6 +53,7 @@ Route::prefix('revenue')->group(function () {
       //get all the date at historical revenue para maipakita sa graph
       Route::get('/history',[RevenuePredictionController::class,'showRevenueHistory']);
       
+      Route::get('/error',[RevenuePredictionController::class,'showError']);
 });
 
  
@@ -69,23 +70,7 @@ Route::prefix('occupancy')->group(function(){
     
 });
  
-// Route::get('/revenue/history', function () {
-//     return RevenuePrediction::select('year', 'month', 'historical_revenue')
-//         ->orderBy('year')
-//         ->orderBy('month')
-//         ->get();
-// });
 
-// Route::get('/revenue/prediction/{type}', function ($type, RevenuePredictionService $service) {
-//     if ($type === 'month') {
-//         return $service->predictMonthly();
-//     } elseif ($type === 'quarter') {
-//         return $service->predictQuarterly();
-//     } elseif ($type === 'annual') {
-//         return $service->predictAnnual();
-//     }
-//     return response()->json(['error' => 'Invalid type'], 400);
-// });
 
 Route::get('/test', [TestController::class, 'test']);
 

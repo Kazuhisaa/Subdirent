@@ -78,4 +78,10 @@ class RevenuePredictionController extends Controller
 
             return response()->json($data);
         }
+        
+
+
+    public function showError(){
+        return response()->json($this->service->quarterlyForecastWithError());
+    }
 }
