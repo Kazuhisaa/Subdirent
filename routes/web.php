@@ -5,6 +5,7 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\UnitsController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\maintenanceRequestAdminController;
 
 
 
@@ -58,3 +59,6 @@ Route::get('/tenant/{tenant}/payment/cancel', [PaymentController::class, 'cancel
 
 
 Route::get('/', [UnitsController::class, 'listView'])->name('home');
+
+Route::get('/admin/maintenance', [MaintenanceRequestAdminController::class, 'index'])
+    ->name('admin.maintenance'); // wala nang auth o is_admin middleware

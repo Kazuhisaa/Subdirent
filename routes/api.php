@@ -8,6 +8,7 @@ use App\Http\Controllers\TenantController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\RevenuePredictionController;
 use App\Http\Controllers\OccupancyPredictionController;
+use App\Http\Controllers\maintenanceRequestController;
 
 use App\Models\RevenuePrediction;
 use App\Services\RevenuePredictionService;
@@ -76,3 +77,13 @@ Route::post('/paymongo/webhook', [PaymentController::class, 'webhook'])
 
 Route::post('/autopay/{tenant}/setup', [AutopayController::class, 'store'])->name('autopay.setup');
 Route::delete('/autopay/{tenant}/disable', [AutopayController::class, 'destroy'])->name('autopay.disable');
+
+
+Route::prefix('/maintenance')->group(function () {
+    Route::get('/requests', [MaintenanceRequestController::class, 'index'])->name('api.maintenance.index');
+    Route::get('/requests/{id}', [MaintenanceRequestController::class, 'show'])->name('api.maintenance.show');
+    Route::post('/requests', [MaintenanceRequestController::class, 'store'])->name('api.maintenance.store');
+    Route::patch('/requests/{id}/status', [MaintenanceRequestController::class, 'updateStatus'])
+        ->name('api.maintenance.updateStatus');
+    Route::delete('/requests/{id}', [MaintenanceRequestController::class, 'destroy'])->name('api.maintenance.destroy');
+});

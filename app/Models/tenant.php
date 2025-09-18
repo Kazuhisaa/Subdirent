@@ -38,5 +38,8 @@ class Tenant extends Model
     {
         return $this->hasOne(Autopay::class);
     }
-
+    public function maintenanceRequests()
+    {
+        return $this->hasMany(MaintenanceRequest::class);
+    }
 }

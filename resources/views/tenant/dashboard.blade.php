@@ -192,90 +192,178 @@
         <p class="text-dark"><strong>Monthly Rent:</strong> {{ $tenant->monthly_rent ?? 'N/A' }}</p>
       </div>
     </div>
-
     <!-- Maintenance Tab -->
     <div class="tab-pane fade" id="maintenance" role="tabpanel">
       <div class="card p-3 bg-white shadow-sm">
-        <h4 class="text-dark fw-bold">Maintenance Requests</h4>
-        <p class="text-dark">No maintenance records yet. (Placeholder)</p>
+        <h4 class="text-dark fw-bold mb-3">Maintenance Requests</h4>
+
+        <!-- Add Request Form -->
+        <form id="maintenanceForm" enctype="multipart/form-data">
+          @csrf
+          <input type="hidden" name="tenant_id" value="{{ $tenant->id }}">
+          <div class="mb-3">
+            <label for="request" class="form-label">Maintenance Request</label>
+            <textarea name="request" id="request" class="form-control" rows="3" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="image" class="form-label">Attach Image (optional)</label>
+            <input type="file" name="image" id="image" class="form-control" accept="image/*">
+          </div>
+          <button type="submit" class="btn btn-primary">Add Request</button>
+        </form>
+        <hr>
+
+        <!-- Requests List -->
+        <div id="maintenanceList">
+          @if($tenant->maintenanceRequests->count() > 0)
+          <ul class="list-group mt-3">
+            @foreach($tenant->maintenanceRequests as $req)
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                {{ $req->request }}
+                @if($req->image)
+                <br>
+                <img src="{{ asset('storage/' . $req->image) }}" alt="Request Image" class="img-thumbnail mt-2" style="max-width: 150px;">
+                @endif
+              </div>
+              <span class="badge bg-{{ $req->status == 'pending' ? 'warning' : 'success' }}">
+                {{ ucfirst($req->status) }}
+              </span>
+            </li>
+            @endforeach
+          </ul>
+          @else
+          <p class="text-dark mt-3">No maintenance records yet.</p>
+          @endif
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- Custom Styles -->
-<style>
-  .nav-tabs .nav-link.active {
-    background-color: #0d3b2e !important;
-    color: #fff !important;
-    font-weight: bold;
-  }
+    <script>
+      maintenanceForm.addEventListener('submit', function(e) {
+        e.preventDefault();
 
-  .nav-tabs .nav-link {
-    color: #000 !important;
-  }
+        let formData = new FormData(this);
+        formData.append('tenant_id', '{{ $tenant->id }}'); // make sure tenant_id is sent
 
-  .card {
-    background-color: #fff !important;
-    color: #000 !important;
-  }
+        fetch('/api/maintenance/requests', { // fixed route
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json'
+            },
+            body: formData
+          })
+          .then(res => {
+            if (!res.ok) throw res;
+            return res.json();
+          })
+          .then(data => {
+            let newItem = document.createElement('li');
+            newItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
 
-  .card p,
-  .card h4,
-  .card strong {
-    color: #000 !important;
-  }
-</style>
-@endsection
+            let imageHTML = data.image ? `<br><img src="/storage/${data.image}" class="img-thumbnail mt-2" style="max-width: 150px;">` : '';
 
-@section('scripts')
-<script>
-  const autopayCheckbox = document.getElementById('autopayCheckbox');
-  const autopayOptions = document.getElementById('autopayOptions');
-  const paymentMethodSelect = document.getElementById('paymentMethodSelect');
-  const paymentDetails = document.getElementById('paymentDetails');
-  const gcashFields = document.getElementById('gcashFields');
-  const cardFields = document.getElementById('cardFields');
+            newItem.innerHTML = `
+<div>${data.request} ${imageHTML}</div>
+<span class="badge bg-warning">${data.status.charAt(0).toUpperCase() + data.status.slice(1)}</span>
+`;
 
-  function togglePaymentDetails() {
-    const method = paymentMethodSelect.value;
-    paymentDetails.style.display = method ? 'block' : 'none';
-    gcashFields.style.display = method === 'gcash' ? 'block' : 'none';
-    cardFields.style.display = method === 'card' ? 'block' : 'none';
-  }
+            if (!maintenanceList.querySelector('ul')) {
+              let ul = document.createElement('ul');
+              ul.classList.add('list-group', 'mt-3');
+              maintenanceList.innerHTML = '';
+              maintenanceList.appendChild(ul);
+            }
+            maintenanceList.querySelector('ul').prepend(newItem);
+            maintenanceForm.reset();
+          })
+          .catch(async err => {
+            let message = '❌ Failed to add maintenance request';
+            if (err.json) {
+              const errData = await err.json();
+              message += `\n${errData.error ?? JSON.stringify(errData)}`;
+            }
+            alert(message);
+          });
+      });
+    </script>
 
-  // Checkbox toggle
-  autopayCheckbox.addEventListener('change', function() {
-    autopayOptions.style.display = this.checked ? 'block' : 'none';
-    if (!this.checked) {
-      paymentDetails.style.display = 'none';
-      paymentMethodSelect.value = '';
-    } else {
-      togglePaymentDetails();
-    }
-  });
 
-  // Payment method select
-  paymentMethodSelect.addEventListener('change', togglePaymentDetails);
 
-  // Initialize display on page load
-  if (autopayCheckbox.checked) {
-    togglePaymentDetails();
-  }
 
-  // Form submit
-  document.getElementById('autopayForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    let formData = new FormData(this);
-    fetch(`/api/tenants/{{ $tenant->id }}/autopay`, {
-        method: 'POST',
-        body: formData
-      })
-      .then(res => res.json())
-      .then(data => {
-        alert('✅ Autopay settings saved!');
-      })
-      .catch(err => alert('❌ Error saving autopay settings'));
-  });
-</script>
-@endsection
+    <!-- Custom Styles -->
+    <style>
+      .nav-tabs .nav-link.active {
+        background-color: #0d3b2e !important;
+        color: #fff !important;
+        font-weight: bold;
+      }
+
+      .nav-tabs .nav-link {
+        color: #000 !important;
+      }
+
+      .card {
+        background-color: #fff !important;
+        color: #000 !important;
+      }
+
+      .card p,
+      .card h4,
+      .card strong {
+        color: #000 !important;
+      }
+    </style>
+    @endsection
+
+    @section('scripts')
+    <script>
+      const autopayCheckbox = document.getElementById('autopayCheckbox');
+      const autopayOptions = document.getElementById('autopayOptions');
+      const paymentMethodSelect = document.getElementById('paymentMethodSelect');
+      const paymentDetails = document.getElementById('paymentDetails');
+      const gcashFields = document.getElementById('gcashFields');
+      const cardFields = document.getElementById('cardFields');
+
+      function togglePaymentDetails() {
+        const method = paymentMethodSelect.value;
+        paymentDetails.style.display = method ? 'block' : 'none';
+        gcashFields.style.display = method === 'gcash' ? 'block' : 'none';
+        cardFields.style.display = method === 'card' ? 'block' : 'none';
+      }
+
+      // Checkbox toggle
+      autopayCheckbox.addEventListener('change', function() {
+        autopayOptions.style.display = this.checked ? 'block' : 'none';
+        if (!this.checked) {
+          paymentDetails.style.display = 'none';
+          paymentMethodSelect.value = '';
+        } else {
+          togglePaymentDetails();
+        }
+      });
+
+      // Payment method select
+      paymentMethodSelect.addEventListener('change', togglePaymentDetails);
+
+      // Initialize display on page load
+      if (autopayCheckbox.checked) {
+        togglePaymentDetails();
+      }
+
+      // Form submit
+      document.getElementById('autopayForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        let formData = new FormData(this);
+        fetch(`/api/tenants/{{ $tenant->id }}/autopay`, {
+            method: 'POST',
+            body: formData
+          })
+          .then(res => res.json())
+          .then(data => {
+            alert('✅ Autopay settings saved!');
+          })
+          .catch(err => alert('❌ Error saving autopay settings'));
+      });
+    </script>
+    @endsection
