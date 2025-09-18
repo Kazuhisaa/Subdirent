@@ -19,7 +19,7 @@ use App\Http\Controllers\AutopayController;
 Route::prefix('booking')->group(function () {
     Route::get('/book-slot', [BookingController::class, 'getByDate']);
     Route::post('/schedule', [BookingController::class, 'store']);
-    Route::get('/allBookings',[BookingController::class,'showAllBooking']);
+    Route::get('/allBookings', [BookingController::class, 'showAllBooking']);
     Route::get('/Testing', [BookingController::class, 'testApi']);
 });
 
@@ -69,19 +69,6 @@ Route::get('/revenue/prediction/{type}', function ($type, RevenuePredictionServi
 
 Route::get('/test', [TestController::class, 'test']);
 
-
-Route::get('/tenant/{tenant}/dashboard', [PaymentController::class, 'dashboard'])
-    ->name('tenant.dashboard');
-
-// Payment Routes
-Route::post('/tenant/{tenant}/pay', [PaymentController::class, 'createPayment'])
-    ->name('payments.create');
-
-Route::get('/tenant/{tenant}/payment/success', [PaymentController::class, 'success'])
-    ->name('payment.success');
-
-Route::get('/tenant/{tenant}/payment/cancel', [PaymentController::class, 'cancel'])
-    ->name('payment.cancel');
 
 Route::post('/paymongo/webhook', [PaymentController::class, 'webhook'])
     ->name('payment.webhook');

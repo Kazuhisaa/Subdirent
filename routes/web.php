@@ -42,3 +42,16 @@ Route::get('/tenant/{tenant}/dashboard', [PaymentController::class, 'dashboard']
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments');
 });
+
+
+Route::post('/tenants/{tenant}/payments', [PaymentController::class, 'createPayment'])
+    ->name('payments.create');
+
+Route::get('/tenant/{tenant}/dashboard', [PaymentController::class, 'dashboard'])
+    ->name('tenant.dashboard');
+
+Route::get('/tenant/{tenant}/payment/success', [PaymentController::class, 'success'])
+    ->name('payment.success');
+
+Route::get('/tenant/{tenant}/payment/cancel', [PaymentController::class, 'cancel'])
+    ->name('payment.cancel');

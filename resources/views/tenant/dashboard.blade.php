@@ -116,20 +116,27 @@
             <div class="card p-4 shadow-sm text-center">
               <h5 class="mb-3">Next Payment</h5>
               <p class="mb-2">{{ $nextMonth['date'] ?? 'Next Payment Date' }}</p>
-              <p class="h4 mb-3">₱{{ $nextMonth['amount'] ?? $tenant->monthly_rent }}</p>
+              <p class="h4 mb-3">₱{{ number_format($nextMonth['amount'] ?? $tenant->monthly_rent, 2) }}</p>
+
+              @if(isset($nextMonth['for_month']))
               <form method="POST" action="{{ route('payments.create', $tenant->id) }}">
                 @csrf
+                <input type="hidden" name="for_month" value="{{ $nextMonth['for_month'] }}">
+
                 <div class="mb-3">
-                  <select class="form-select" name="payment_method" required>
-                    <option value="card">Credit/Debit Card</option>
+                  <label for="payment_method" class="form-label">Select Payment Method</label>
+                  <select name="payment_method" id="payment_method" class="form-select" required>
+                    <option value="" disabled selected>-- Choose Payment Method --</option>
                     <option value="gcash">GCash</option>
+                    <option value="card">Credit/Debit Card</option>
                   </select>
                 </div>
+
                 <button type="submit" class="btn btn-success w-100">
                   Pay Now
                 </button>
               </form>
-
+              @endif
 
             </div>
           </div>

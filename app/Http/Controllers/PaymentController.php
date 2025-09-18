@@ -4,213 +4,227 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use App\Models\Tenant;
 use App\Models\Payment;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
-  // Create PayMongo Checkout (Card / GCash)
-    public function createPayment(Request $request, Tenant $tenant)
+
+  public function createPayment(Request $request, Tenant $tenant)
   {
-      $method = $request->input('payment_method');
 
-      if (!in_array($method, ['card', 'gcash'])) {
-          return redirect()->route('tenant.dashboard', $tenant->id)
-              ->with('error', 'Invalid payment method for PayMongo.');
-      }
+    Log::info('🚀 Entered createPayment for tenant ' . $tenant->id);
 
-      // Determine next unpaid month
-      $payments = $tenant->payments()->pluck('for_month')->toArray();
-      $nextMonth = now()->format('Y-m');
+    $method = $request->input('payment_method');
+    $forMonth = $request->input('for_month', now()->format('Y-m'));
 
-      $start = new \DateTime($tenant->lease_start);
-      $end = new \DateTime($tenant->lease_end);
-
-      while ($start <= $end) {
-          $monthKey = $start->format('Y-m');
-          if (!in_array($monthKey, $payments)) {
-              $nextMonth = $monthKey;
-              break;
-          }
-          $start->modify('+1 month');
-      }
-
-      $response = Http::withBasicAuth(config('services.paymongo.secret_key'), '')
-          ->post('https://api.paymongo.com/v1/checkout_sessions', [
-              'data' => [
-                  'attributes' => [
-                      'line_items' => [[
-                          'name' => 'Monthly Rent',
-                          'quantity' => 1,
-                          'currency' => 'PHP',
-                          'amount' => $tenant->monthly_rent * 100, // convert to centavos
-                      ]],
-                      'payment_method_types' => ['card', 'gcash'],
-                      'success_url' => route('payment.success', $tenant->id),
-                      'cancel_url' => route('payment.cancel', $tenant->id),
-                      'description' => 'Rent payment for ' . $tenant->first_name,
-                      'metadata' => [
-                          'tenant_id' => $tenant->id,
-                          'for_month' => $nextMonth
-                      ]
-                  ]
-              ]
-          ]);
-
-      $checkout = $response->json();
-
-      if (isset($checkout['data']['attributes']['checkout_url'])) {
-          return redirect($checkout['data']['attributes']['checkout_url']);
-      }
-
+    if (!in_array($method, ['card', 'gcash'])) {
       return redirect()->route('tenant.dashboard', $tenant->id)
-          ->with('error', 'Failed to create PayMongo checkout.');
+        ->with('error', 'Invalid payment method for PayMongo.');
+    }
+
+    $baseUrl = config('services.ngrok.url');
+
+    $response = Http::withBasicAuth(config('services.paymongo.secret_key'), '')
+      ->post('https://api.paymongo.com/v1/checkout_sessions', [
+        'data' => [
+          'attributes' => [
+            'line_items' => [[
+              'name' => "Monthly Rent - {$tenant->first_name}",
+              'quantity' => 1,
+              'currency' => 'PHP',
+              'amount' => intval($tenant->monthly_rent * 100), // ✅ ensure integer
+            ]],
+            'payment_method_types' => ['card', 'gcash'],
+            'success_url' => config('app.url') . route('payment.success', $tenant->id, false),
+            'cancel_url' => config('app.url') . route('payment.cancel', $tenant->id, false),
+            'description' => "Rent payment for {$tenant->first_name}",
+            'metadata' => [
+              'tenant_id' => $tenant->id,
+              'for_month' => $forMonth,
+            ]
+          ]
+        ]
+      ]);
+
+    $checkout = $response->json();
+
+    // 🔍 log the full response
+    Log::info('🔍 PayMongo Checkout Response:', $checkout);
+
+    if (isset($checkout['data']['attributes']['checkout_url'])) {
+      return redirect()->away($checkout['data']['attributes']['checkout_url']);
+    }
+
+    return back()->with(
+      'error',
+      'Failed to create payment session. Response: ' . json_encode($checkout)
+    );
   }
 
-
-  // Success page
   public function success(Tenant $tenant)
   {
-    return view('tenant.success', compact('tenant'));
+    return redirect()->to(route('tenant.dashboard', $tenant->id, false))
+      ->with('success', 'Payment successful!');
   }
 
   public function cancel(Tenant $tenant)
   {
-    return view('tenant.cancel', compact('tenant')); // kung cancel mo rin nasa tenant folder
-  }
-
-      public function webhook(Request $request)
-  {
-      Log::info('PayMongo webhook received', $request->all());
-
-      $eventType = $request->input('data.type');
-      $attributes = $request->input('data.attributes', []);
-      $metadata = $attributes['metadata'] ?? [];
-
-      $tenantId = $metadata['tenant_id'] ?? null;
-      $forMonth = $metadata['for_month'] ?? now()->format('Y-m');
-      $status = $attributes['status'] ?? null;
-
-      Log::info('Webhook attributes', $attributes);
-      Log::info('Metadata', $metadata);
-
-      if (!$tenantId) {
-          return response()->json(['status' => 'error', 'message' => 'No tenant ID in metadata'], 400);
-      }
-
-      $tenant = Tenant::find($tenantId);
-      if (!$tenant) {
-          return response()->json(['status' => 'error', 'message' => 'Tenant not found'], 404);
-      }
-
-      if ($status === 'paid') {
-          $exists = Payment::where('tenant_id', $tenantId)
-              ->where('for_month', $forMonth)
-              ->where('method', 'PayMongo')
-              ->where('status', 'paid')
-              ->exists();
-
-          if (!$exists) {
-              Payment::create([
-                  'tenant_id' => $tenant->id,
-                  'amount' => $tenant->monthly_rent,
-                  'payment_date' => now(),
-                  'status' => 'paid',
-                  'method' => 'PayMongo',
-                  'for_month' => $forMonth,
-              ]);
-          }
-      }
-
-      return response()->json(['status' => 'ok']);
+    return redirect()->to(route('tenant.dashboard', $tenant->id, false))
+      ->with('error', 'Payment cancelled.');
   }
 
 
-
-
-  // Dashboard + payment summary
-  public function dashboard(Tenant $tenant)
+  // ✅ Webhook from PayMongo
+  public function webhook(Request $request)
   {
-    $payments = $tenant->payments()->orderBy('created_at', 'desc')->get();
+    $payload = $request->all();
 
-    $nextMonth = null;
-    if ($tenant->lease_start && $tenant->lease_end) {
-      $start = new \DateTime($tenant->lease_start);
-      $start->modify('first day of this month');
+    Log::info('🔔 PayMongo Webhook Raw Payload: ' . json_encode($payload));
 
-      $end = new \DateTime($tenant->lease_end);
-      $end->modify('first day of this month');
+    $eventType = $payload['data']['attributes']['type'] ?? null;
+    $checkoutData = $payload['data']['attributes']['data']['attributes'] ?? [];
 
-      while ($start <= $end) {
-        $monthKey = $start->format('Y-m');
+    // Parse metadata (priority: checkout session → payment_intent)
+    $tenantId = $checkoutData['metadata']['tenant_id']
+      ?? ($checkoutData['payment_intent']['attributes']['metadata']['tenant_id'] ?? null);
 
-        if (!$nextMonth && !$payments->firstWhere('for_month', $monthKey)) {
-          $nextMonth = [
-            'month' => $start->format('F Y'),
-            'date'  => $start->format('F d, Y'),
-            'amount' => $tenant->monthly_rent,
-            'for_month' => $monthKey,
-          ];
-        }
+    $forMonth = $checkoutData['metadata']['for_month']
+      ?? ($checkoutData['payment_intent']['attributes']['metadata']['for_month'] ?? now()->format('Y-m'));
 
-        $start->modify('+1 month');
+    // Payment details
+    $payments = $checkoutData['payments'] ?? [];
+    $paymentStatus = $payments[0]['attributes']['status'] ?? null;
+    $referenceId   = $payments[0]['id'] ?? null;
+    $paidAt        = $payments[0]['attributes']['paid_at'] ?? now();
+
+    Log::info("📌 Event: {$eventType}, Tenant: {$tenantId}, Month: {$forMonth}, Status: {$paymentStatus}");
+
+    if (!$tenantId) {
+      return response()->json(['status' => 'error', 'message' => 'No tenant ID'], 400);
+    }
+
+    $tenant = Tenant::find($tenantId);
+    if (!$tenant) {
+      return response()->json(['status' => 'error', 'message' => 'Tenant not found'], 404);
+    }
+
+    if ($eventType === 'checkout_session.payment.paid' && $paymentStatus === 'paid') {
+      $exists = Payment::where('tenant_id', $tenantId)
+        ->where('for_month', $forMonth)
+        ->where('method', 'PayMongo')
+        ->where('status', 'paid')
+        ->exists();
+
+      if (!$exists) {
+        Payment::create([
+          'tenant_id' => $tenant->id,
+          'amount' => $tenant->monthly_rent,
+          'payment_date' => now(),
+          'paid_at' => Carbon::createFromTimestamp($paidAt),
+          'status' => 'paid',
+          'method' => 'PayMongo',
+          'for_month' => $forMonth,
+          'reference_id' => $referenceId,
+        ]);
+
+        Log::info("✅ Payment saved: Tenant {$tenant->id}, Month {$forMonth}");
       }
     }
 
-    if (!$nextMonth) {
-      $start = new \DateTime($tenant->lease_start);
-      $start->modify('+1 month');
+    return response()->json(['status' => 'ok']);
+  }
 
+  // ✅ Tenant Dashboard + Payment Summary
+  public function dashboard(Tenant $tenant)
+  {
+    // ✅ Kunin lahat ng bayad (na-verified na "paid")
+    $payments = Payment::where('tenant_id', $tenant->id)
+      ->where('status', 'paid')
+      ->orderBy('for_month')
+      ->get();
+
+    // Listahan ng paid months (e.g. ["2025-09", "2025-10"])
+    $paidMonths = $payments->pluck('for_month')->toArray();
+
+    // ✅ Buong lease period months
+    $leaseStart = Carbon::parse($tenant->lease_start)->startOfMonth();
+    $leaseEnd   = Carbon::parse($tenant->lease_end)->startOfMonth();
+
+    $allMonths = [];
+    $current = $leaseStart->copy();
+    while ($current <= $leaseEnd) {
+      $allMonths[] = $current->format('Y-m'); // e.g. "2025-09"
+      $current->addMonth();
+    }
+
+    // ✅ Alamin kung ano ang hindi pa nababayaran
+    $unpaidMonths = array_values(array_diff($allMonths, $paidMonths));
+
+    // Totals
+    $totalPaid = $payments->sum('amount');
+    $totalDue = count($unpaidMonths) * $tenant->monthly_rent;
+    $outstanding = max($totalDue, 0);
+
+    // ✅ Next unpaid month
+    if (!empty($unpaidMonths)) {
+      $nextMonthStr = $unpaidMonths[0]; // unang hindi bayad
+      $nextMonthDate = Carbon::createFromFormat('Y-m', $nextMonthStr);
       $nextMonth = [
-        'month' => $start->format('F Y'),
-        'date'  => $start->format('F d, Y'),
+        'date' => $nextMonthDate->format('F Y'),
         'amount' => $tenant->monthly_rent,
-        'for_month' => $start->format('Y-m'),
+        'for_month' => $nextMonthStr,
+      ];
+    } else {
+      $nextMonth = [
+        'date' => null,
+        'amount' => 0,
+        'status' => 'All months are paid 🎉',
       ];
     }
 
-    $totalDue = $nextMonth['amount'] ?? $tenant->monthly_rent;
-    $totalPaid = $payments->sum('amount');
-    $outstanding = max($totalDue - $totalPaid, 0);
 
     return view('tenant.dashboard', compact(
       'tenant',
-      'payments',
-      'nextMonth',
-      'totalDue',
-      'totalPaid',
-      'outstanding'
+      'payments',    // history ng payments
+      'nextMonth',   // susunod na dapat bayaran
+      'totalDue',    // lahat ng hindi pa bayad
+      'totalPaid',   // lahat ng nabayad na
+      'outstanding'  // balance
     ));
   }
-    public function adminPayments(Request $request)
-    {
-        // Month parameter, default to current
-        $month = $request->input('month', Carbon::now()->format('Y-m'));
 
-        // Get tenants with related payments for selected month
-        $tenants = Tenant::with(['unit', 'payments' => function($q) use ($month) {
-            $q->where('for_month', $month);
-        }, 'autopay'])->get();
+  // ✅ Admin Payments Page
+  public function adminPayments(Request $request)
+  {
+    $month = $request->input('month', Carbon::now()->format('Y-m'));
 
-        $carbonMonth = Carbon::createFromFormat('Y-m', $month);
-        $prevMonth = $carbonMonth->copy()->subMonth()->format('Y-m');
-        $nextMonth = $carbonMonth->copy()->addMonth()->format('Y-m');
+    $tenants = Tenant::with([
+      'unit',
+      'payments' => function ($q) use ($month) {
+        $q->where('for_month', $month);
+      },
+      'autopay'
+    ])->get();
 
-        return view('admin.payments', compact('tenants', 'month', 'prevMonth', 'nextMonth'));
-    }
-    public function index(Request $request)
-    {
-        // Default to current month
-        $month = $request->input('month', Carbon::now()->format('Y-m'));
+    $carbonMonth = Carbon::createFromFormat('Y-m', $month);
+    $prevMonth = $carbonMonth->copy()->subMonth()->format('Y-m');
+    $nextMonth = $carbonMonth->copy()->addMonth()->format('Y-m');
 
-        // Get all tenants with their payments for the given month
-        $tenants = Tenant::with(['payments' => function ($query) use ($month) {
-            $query->where('for_month', $month);
-        }])->get();
+    return view('admin.payments', compact('tenants', 'month', 'prevMonth', 'nextMonth'));
+  }
 
-        return view('admin.payments', compact('tenants', 'month'));
+  // ✅ Admin Index (summary of payments by month)
+  public function index(Request $request)
+  {
+    $month = $request->input('month', Carbon::now()->format('Y-m'));
 
-    }
+    $tenants = Tenant::with(['payments' => function ($query) use ($month) {
+      $query->where('for_month', $month);
+    }])->get();
+
+    return view('admin.payments', compact('tenants', 'month'));
+  }
 }
