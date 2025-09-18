@@ -38,4 +38,5 @@ class Tenant extends Model
     {
         return $this->hasOne(Autopay::class);
     }
+
 }

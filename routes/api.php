@@ -80,11 +80,8 @@ Route::get('/tenant/{tenant}/payment/success', [PaymentController::class, 'succe
 Route::get('/tenant/{tenant}/payment/cancel', [PaymentController::class, 'cancel'])
     ->name('payment.cancel');
 
-// Webhook (PayMongo callback)
-Route::post('/api/paymongo/webhook', [PaymentController::class, 'webhook'])
+Route::post('/paymongo/webhook', [PaymentController::class, 'webhook'])
     ->name('payment.webhook');
-
-
 
 Route::prefix('tenants')->group(function () {
     Route::post('{tenant}/autopay', [AutopayController::class, 'storeOrUpdate']);

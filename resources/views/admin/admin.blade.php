@@ -111,7 +111,7 @@
       <a href="#" class="btn fw-semibold">
         <i class="bi bi-journal-check"></i> <span>Bookings</span>
       </a>
-      <a href="#" class="btn fw-semibold">
+      <a href="{{ route('admin.payments') }}"  class="btn fw-semibold">
         <i class="bi bi-cash-stack"></i> <span>Payments</span>
       </a>
       <a href="#" class="btn fw-semibold">

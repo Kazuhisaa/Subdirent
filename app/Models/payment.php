@@ -17,7 +17,10 @@ class Payment extends Model
         'method',
         'reference',
         'for_month',
-        'payment_date'
+        'payment_date',
+        'due_date',
+        'paid_at',
+
     ];
 
     // Relationship: Payment belongs to a Tenant

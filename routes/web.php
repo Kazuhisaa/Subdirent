@@ -38,3 +38,7 @@ Route::get('/admin/analytics', function () {
 
 Route::get('/tenant/{tenant}/dashboard', [PaymentController::class, 'dashboard'])
     ->name('tenant.dashboard');
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments');
+});
