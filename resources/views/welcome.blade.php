@@ -301,6 +301,22 @@
     </script>
 
     @vite('resources/bootstrapjs/js/bootstrap.bundle.min.js')
+
+    <!-- Unit Modal -->
+    <div class="modal fade" id="unitModal" tabindex="-1" aria-labelledby="unitModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="unitModalLabel">Unit Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="unitModalBody">
+                    <!-- Dynamic content will load here (Booking / Apply Form) -->
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 
